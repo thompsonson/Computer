@@ -1,6 +1,8 @@
 # mine
 chatgpt.txt
 telegram_response.txt
+*.ogg
+*.session
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
