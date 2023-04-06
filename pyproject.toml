@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "computer"
+version = "0.1.0"
+description = "Human Computer Interface"
+authors = ["Matt Thompson <thompsonson@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Telethon = "^1.27.0"
+openai = "^0.27.3"
+sqlalchemy = "^2.0.8"
+pytest = "^7.2.2"
+flask = "^2.2.3"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+pylint = "^2.17.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
