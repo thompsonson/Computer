@@ -11,7 +11,7 @@ Telethon = "^1.27.0"
 openai = "^0.27.3"
 sqlalchemy = "^2.0.8"
 pytest = "^7.2.2"
-flask = "^2.2.3"
+quart = "^0.18.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

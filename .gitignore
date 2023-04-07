@@ -3,6 +3,7 @@ chatgpt.txt
 telegram_response.txt
 *.ogg
 *.session
+*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

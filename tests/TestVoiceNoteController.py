@@ -6,6 +6,7 @@ from controllers.controller_notes import VoiceNoteController
 from controllers.controller_openai import transcribe_speech
 from exceptions import CommandException
 
+
 class TestVoiceNoteController:
     def test_transcribe_with_force(self):
         mock_model = Mock()
@@ -15,10 +16,12 @@ class TestVoiceNoteController:
         mock_model.content = "some other text"
         mock_controller = Mock()
         mock_controller._ogg2mp3.return_value = "/path/to/mp3/file"
-        with patch("controllers.controller_openai.transcribe_speech") as mock_transcribe:
+        with patch(
+            "controllers.controller_openai.transcribe_speech"
+        ) as mock_transcribe:
             mock_transcribe.return_value = "transcripted_text"
             voice_note_controller = VoiceNoteController(mock_model)
-             # mock the _ogg2mp3() method
+            # mock the _ogg2mp3() method
             voice_note_controller._ogg2mp3 = mock_controller._ogg2mp3
             voice_note_controller.transcribe(force=True)
             assert voice_note_controller.model.content == "transcripted_text"
@@ -28,8 +31,10 @@ class TestVoiceNoteController:
     def test_transcribe_without_force(self):
         mock_model = Mock()
         mock_model.transcribed = False
-        with patch("controllers.controller_openai.transcribe_speech") as mock_transcribe:
-            mock_transcribe.return_value = "transcripted_text"  
+        with patch(
+            "controllers.controller_openai.transcribe_speech"
+        ) as mock_transcribe:
+            mock_transcribe.return_value = "transcripted_text"
             voice_note_controller = VoiceNoteController(mock_model)
             voice_note_controller.transcribe()
             assert mock_model.transcribed

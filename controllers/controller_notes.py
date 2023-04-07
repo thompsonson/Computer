@@ -6,9 +6,11 @@ import logging
 
 import openai
 
-from models.model_notes import NoteModel, VoiceNoteModel
+from models.model_notes import NoteModel, VoiceNoteModel, Base
 import controllers.controller_openai as controller_openai
 from exceptions import CommandException
+
+from dal import create_engine_and_session
 
 import settings
 
@@ -18,11 +20,28 @@ logger = logging.getLogger(__name__)
 class NoteController:
     """This class handles manipulation of a note."""
 
-    def __init__(self, note_model: NoteModel):
-        self.model = note_model
+    def __init__(self, *args, **kwargs):
+        # args -- tuple of anonymous arguments
+        # kwargs -- dictionary of named arguments
+        if "note_model" in kwargs:
+            self.model = kwargs["note_model"]
+        elif "id" in kwargs:
+            self.session = create_engine_and_session(Base)
+            self.model = (
+                self.session.query(NoteModel).filter_by(id=kwargs["id"]).first()
+            )
+            if not self.model:
+                raise ValueError("No note with that id")
+        else:
+            raise ValueError("No note model or id provided")
 
-    def generate_additonal_info(self):
+    async def generate_additonal_info(self):
         "Calls GPT to generate topics, summary and sentiment"
+        await controller_openai.generate_additonal_info(self.model)
+        logger.info(self.model)
+        logger.info(f"content: {self.model.content}")
+        logger.info(f"source: {self.model.source}")
+        logger.info(f"type: {self.model.type}")
 
     def add_to_index(self):
         "adds the note to the index for searching"

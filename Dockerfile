@@ -27,5 +27,5 @@ RUN apt-get update && apt-get install -y ffmpeg
 ENV PYTHONPATH "${PYTHONPATH}:/app/"
 
 EXPOSE 8080
-CMD ["/app/entry.sh"]
+CMD ["poetry", "run", "python", "main.py"]
 

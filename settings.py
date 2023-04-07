@@ -19,3 +19,7 @@ T2S_MODEL = "whisper-1"
 BOT_TOKEN = os.getenv("TELEGRAM_COMPUTERBOT")
 API_ID = os.getenv("TELEGRAM_APP_ID")
 API_HASH = os.getenv("TELEGRAM_APP_HASH")
+TELEGRAM_SESSION = "telegram.session"
+
+# database related
+DATABASE = "sqlite:///database.db"
