@@ -10,9 +10,6 @@ from controllers.controller_notes import VoiceNoteController, NoteController
 from controllers.controller_bot import MessageSend
 from controllers.controller_openai import correct_text, translate_text
 
-from main import bot
-
-from DBAdapter import create_engine_and_session
 
 logger = logging.getLogger(__name__)
 message_store = MessageSend()
@@ -20,24 +17,21 @@ message_store = MessageSend()
 logger.info("Hello World")
 
 
-@bot.on(events.NewMessage(pattern="/correct"))
-async def correct(event):
+async def correct_handler(event):
     """Use OpenAI Da Vinci to correct the previous message"""
     response = await correct_text(message_store.get_last())
     await message_store.send(event, response.choices[0].text)  # type: ignore
     raise events.StopPropagation
 
 
-@bot.on(events.NewMessage(pattern="/translate"))
-async def translate(event):
+async def translate_handler(event):
     """Use OpenAI Da Vinci to translate the previous message"""
     response = await translate_text(message_store.get_last())
     await message_store.send(event, response.choices[0].text)  # type: ignore
     raise events.StopPropagation
 
 
-@bot.on(events.NewMessage(pattern="/enrich"))
-async def enrich(event):
+async def enrich_handler(event):
     """Use OpenAI Da Vinci to translate the previous message"""
     match = re.search(r"^/enrich\s(\d+)$", event.text)
     if match:
@@ -51,8 +45,7 @@ async def enrich(event):
     raise events.StopPropagation
 
 
-@bot.on(events.NewMessage)  # type: ignore
-async def echo(event):
+async def new_message_handler(event):
     """Echo the user message."""
     if event.voice:
         # await event.respond("processing the voice message")
@@ -77,14 +70,3 @@ async def echo(event):
         )
     else:
         await event.respond(event.text)
-
-
-def start_telegram_bot():
-    """Start the bot."""
-    bot.run_until_disconnected()
-
-
-if __name__ == "__main__":
-    bot = TelegramClient(settings.TELEGRAM_SESSION, int(settings.API_ID), settings.API_HASH)  # type: ignore
-    bot.start(bot_token=settings.BOT_TOKEN)  # type: ignore
-    start_telegram_bot()
