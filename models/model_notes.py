@@ -1,7 +1,7 @@
 """data models for notes"""
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table
-from sqlalchemy.orm import declarative_base, Mapped, mapped_column
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import declarative_base, relationship, Mapped, mapped_column
 
 notes_base = declarative_base()
 
@@ -11,7 +11,6 @@ class NoteModel(notes_base):
 
     __tablename__ = "note_base"
 
-    # added from source
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), nullable=True)
     content: Mapped[str] = mapped_column(nullable=True)
@@ -26,23 +25,38 @@ class NoteModel(notes_base):
     dirty: Mapped[bool] = mapped_column(nullable=True)
     index_reference: Mapped[str] = mapped_column(nullable=True)
 
-    __mapper_args__ = {
-        "polymorphic_identity": "note",
-        "polymorphic_on": "type",
-    }
+    notes = relationship("NoteTypeModel", back_populates="note")
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.id!r}) - {self.name!r}"
 
 
-class VoiceNoteModel(NoteModel):
+class NoteTypeModel(notes_base):
+    """Base class for note types"""
+
+    __tablename__ = "note_type_base"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    type: Mapped[str] = mapped_column(nullable=True)
+
+    __mapper_args__ = {
+        "polymorphic_identity": "note_type",
+        "polymorphic_on": "type",
+    }
+
+    note_id = Column(Integer, ForeignKey("note_base.id"))
+    note = relationship("NoteModel", back_populates="notes")
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.note.id!r}) - {self.type!r}"
+
+
+class VoiceNoteModel(NoteTypeModel):
     """class for voice notes"""
 
     __tablename__ = "note_voicenote"
 
-    id: Mapped[int] = mapped_column(ForeignKey("note_base.id"), primary_key=True)
-
-    # file information
+    id: Mapped[int] = mapped_column(ForeignKey("note_type_base.id"), primary_key=True)
     file_location: Mapped[str] = mapped_column(nullable=True)
     file_encoding: Mapped[str] = mapped_column(nullable=True)
     # processing
@@ -55,4 +69,4 @@ class VoiceNoteModel(NoteModel):
     }
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.name!r})"
+        return f"{self.__class__.__name__}({self.note.id!r}) - {self.type!r}"

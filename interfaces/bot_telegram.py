@@ -37,7 +37,9 @@ async def enrich_handler(event):
     if match:
         # If a number was found, convert it to an integer
         number = int(match.group(1))
-        await NoteController(id=number).generate_additonal_info()
+        note = NoteController()
+        await note.generate_additonal_info(note_id=number)
+        note.save()  # type: ignore
         await message_store.send(event, f"Enriched note {number}")
     else:
         # If no number was found, print an error message
@@ -55,18 +57,17 @@ async def new_message_handler(event):
             "downloaded the voice message: downloads/voicenotes/%s.ogg",
             event.message.id,
         )
-        voice_note = VoiceNoteController(
-            VoiceNoteModel(
-                source=f"telegram/{event.message.id}",
-                file_location=f"downloads/voicenotes/{event.message.id}.ogg",
-                file_encoding="ogg",
-            )
+        voice_note = VoiceNoteController()
+        voice_note.new(
+            source=f"telegram/{event.message.id}",
+            file_location=f"downloads/voicenotes/{event.message.id}.ogg",
+            file_encoding="ogg",
         )
-        voice_note.transcribe()
-        voice_note.save()  # type: ignore
+        #voice_note.transcribe()
+        #voice_note.save()  # type: ignore
         await message_store.send(
             event,
-            f"Note ID: {voice_note.model.id} Content:\n{voice_note.model.content}",
+            str(voice_note.get_id()),
         )
     else:
         await event.respond(event.text)
