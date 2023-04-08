@@ -85,45 +85,53 @@ class VoiceNoteController:
 
     def fully_load_voicenote(self) -> Optional[int]:
         """gets the id for the controller's voice note model"""
-        with DBAdapter().managed_session() as session:
-            self._voice_note_model = (
-                session.query(VoiceNoteModel)
-                .filter_by(id=self._voice_note_model.id)
-                .first()
-            )
-            return self._voice_note_model.id
+        if self._voice_note_model.id is None:
+            raise ValueError("No voice note model loaded within the class")
+        if self.session is None:
+            self.session = DBAdapter().unmanaged_session()
+        self.session.begin()
+        self._voice_note_model = (
+            self.session.query(VoiceNoteModel)
+            .filter_by(id=self._voice_note_model.id)
+            .first()
+        )
+        return self._voice_note_model.id
 
     def get_voice_note_info(self) -> Optional[Tuple[int, str, int]]:
         """Returns the voice_note_id, note_content, and note_id for the given voice_note_id"""
-        with DBAdapter().managed_session() as session:
-            # Query for the VoiceNoteModel instance with the given id
-            logger.info(f"voice_note_id: {self.voice_note_id}")
-            voice_note_model = (
-                session.query(VoiceNoteModel)
-                .filter_by(id=self.voice_note_id)
-                .first()
-            )
-            logger.info(f"voice_note_model: {voice_note_model}")
-            if voice_note_model is None:
-                return None
-            voice_note_id = voice_note_model.id
+        if self.session is None:
+            self.session = DBAdapter().unmanaged_session()
+        # Query for the VoiceNoteModel instance with the given id
+        logger.info("voice_note_id: %s", self.voice_note_id)
+        voice_note_model = (
+            self.session.query(VoiceNoteModel)
+            .filter_by(id=self.voice_note_id)
+            .first()
+        )
+        logger.info("voice_note_model: %s", voice_note_model)
+        if voice_note_model is None:
+            raise ValueError("No voice note model loaded within the class")
+        voice_note_id = voice_note_model.id
 
-            # Extract the required values from the VoiceNoteModel and its associated NoteModel
-            note_content = (
-                voice_note_model.note.content
-                if voice_note_model.note is not None
-                else None
-            )
-            note_id = (
-                voice_note_model.note.id if voice_note_model.note is not None else None
-            )
-            return voice_note_id, note_content, note_id # type: ignore
+        # Extract the required values from the VoiceNoteModel and its associated NoteModel
+        note_content = (
+            voice_note_model.note.content
+            if voice_note_model.note is not None
+            else None
+        )
+        note_id = (
+            voice_note_model.note.id if voice_note_model.note is not None else None
+        )
+        return voice_note_id, note_content, note_id # type: ignore
 
     def save(self):
         """Saves the note to the database"""
-        with DBAdapter().managed_session() as session:  # type: ignore
-            session.add_all([self._note_model, self._voice_note_model])
-            logger.info("saved the voice note to the database")
+        if self.session is None:
+            self.session = DBAdapter().unmanaged_session()
+        self.session.begin()
+        self.session.add_all([self._note_model, self._voice_note_model])
+        self.session.commit()
+        logger.info("saved the voice note to the database")
 
     def _transcribe(self, force: bool = False):
         """function to transcibe the audio from a voice message"""
@@ -138,9 +146,7 @@ class VoiceNoteController:
             self._note_model.content = transcript  # type: ignore
             self._voice_note_model.service_used = f"openai/{settings.T2S_MODEL}"
             self._voice_note_model.transcribed = True  # type: ignore
-            # with DBAdapter().managed_session() as session:  # type: ignore
-            #    session.add_all([self._note_model, self._voice_note_model])
-            #    logger.info("saved the transcibed content of the voice note to the database")
+
 
     def _run_command(self, command: list) -> int:
         """Run a command, given an array of the command and arguments"""
