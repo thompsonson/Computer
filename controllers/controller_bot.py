@@ -7,6 +7,7 @@ import settings
 
 logger = logging.getLogger(__name__)
 
+
 class TelethonWrapper:
     "telegram bot controller, using telethon"
 
@@ -21,6 +22,7 @@ class TelethonWrapper:
             TelegramClient: the telegram client
         """
         if self._bot is None:
+            logger.info("creating TelegramClient")
             self._bot = TelegramClient(
                 settings.TELEGRAM_SESSION,
                 int(settings.TELEGRAM_API_ID),  # type: ignore
@@ -30,7 +32,7 @@ class TelethonWrapper:
 
     def get_loop(self):
         "get the event loop"
-        return self._bot.loop # type: ignore
+        return self._bot.loop  # type: ignore
 
     def start(self) -> None:
         "start the bot"

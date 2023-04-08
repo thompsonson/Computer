@@ -37,7 +37,9 @@ async def enrich_handler(event):
     if match:
         # If a number was found, convert it to an integer
         number = int(match.group(1))
-        await NoteController(id=number).generate_additonal_info()
+        note = NoteController()
+        await note.generate_additonal_info(note_id=number)
+        note.save()  # type: ignore
         await message_store.send(event, f"Enriched note {number}")
     else:
         # If no number was found, print an error message

@@ -4,7 +4,7 @@ import os
 import subprocess
 import logging
 
-import openai
+import settings
 
 from models.model_notes import NoteModel, VoiceNoteModel
 import controllers.controller_openai as controller_openai
@@ -18,26 +18,20 @@ logger = logging.getLogger(__name__)
 class NoteController:
     """This class handles manipulation of a note."""
 
-    def __init__(self, *args, **kwargs):
-        # args -- tuple of anonymous arguments
-        # kwargs -- dictionary of named arguments
-        if "note_model" in kwargs:
-            self.model = kwargs["note_model"]
-        elif "id" in kwargs:
-            with DBAdapter.session() as session:  # type: ignore
-                self.model = session.query(NoteModel).filter_by(id=kwargs["id"]).first()  # type: ignore
-                if not self.model:
-                    raise ValueError("No note with that id")
-        else:
-            raise ValueError("No note model or id provided")
+    def __init__(self):
+        self.model = None
 
     def save(self):
         """Saves the note to the database"""
-        with DBAdapter.session() as session:  # type: ignore
+        with DBAdapter().managed_session() as session:  # type: ignore
             session.add(self.model)  # type: ignore
 
-    async def generate_additonal_info(self):
+    async def generate_additonal_info(self, note_id: int):
         "Calls GPT to generate topics, summary and sentiment"
+        with DBAdapter().managed_session() as session:  # type: ignore
+            self.model = session.query(NoteModel).filter_by(id=note_id).first()  # type: ignore
+            if not self.model:
+                raise ValueError("No note with that id")
         await controller_openai.generate_additonal_info(self.model)
         logger.info(self.model)
         logger.info(f"content: {self.model.content}")
@@ -57,10 +51,11 @@ class NoteController:
         self.model.dirty = False
 
 
-class VoiceNoteController:
+class VoiceNoteController(NoteController):
     """class for handling voice notes"""
 
     def __init__(self, model: VoiceNoteModel):
+        super().__init__()
         self.model = model
 
     def transcribe(self, force: bool = False):
@@ -76,6 +71,8 @@ class VoiceNoteController:
             self.model.content = transcript  # type: ignore
             self.model.service_used = f"openai/{settings.T2S_MODEL}"
             self.model.transcribed = True  # type: ignore
+            with DBAdapter().managed_session() as session:  # type: ignore
+                session.add(self.model)  # type: ignore
 
     def _run_command(self, command: list) -> int:
         """Run a command, given an array of the command and arguments"""
