@@ -27,7 +27,7 @@ class TelethonWrapper:
         "start the bot"
         logger.info("starting the bot")
         self._bot.start(bot_token=settings.TELEGRAM_BOT_TOKEN)  # type: ignore
-        #self._bot.run_until_disconnected()  # type: ignore
+        # self._bot.run_until_disconnected()  # type: ignore
         logger.info("bot started (or finished, depending on how asynio works)")
 
     def add_event_handler(self, event_handler, event):

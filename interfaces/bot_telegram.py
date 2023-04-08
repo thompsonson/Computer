@@ -63,11 +63,11 @@ async def new_message_handler(event):
             file_location=f"downloads/voicenotes/{event.message.id}.ogg",
             file_encoding="ogg",
         )
-        #voice_note.transcribe()
-        #voice_note.save()  # type: ignore
+        # voice_note.transcribe()
+        # voice_note.save()  # type: ignore
         await message_store.send(
             event,
-            str(voice_note.get_id()),
+            str(voice_note.fully_load_voicenote()),
         )
     else:
         await event.respond(event.text)

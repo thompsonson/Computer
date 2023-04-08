@@ -3,6 +3,7 @@ import tempfile
 import os
 import subprocess
 import logging
+from typing import Optional, Union
 
 import settings
 
@@ -58,8 +59,8 @@ class VoiceNoteController:
     """class for handling voice notes"""
 
     def __init__(self):
-        self._voice_note_model = None
-        self._note_model = None
+        self._voice_note_model: VoiceNoteModel
+        self._note_model: NoteModel
 
     def __str__(self) -> str:
         return f"Voice Note ID: {self._voice_note_model.id!r} Note:\n{self._voice_note_model.note!r}"
@@ -78,11 +79,17 @@ class VoiceNoteController:
             session.add_all([self._note_model, self._voice_note_model])
             logger.info("new added the voice note to the database")
 
-    def get_id(self):
-        """gets the model for the controller"""
+    def fully_load_voicenote(self) -> Optional[int]:
+        """gets the id for the controller's voice note model"""
         with DBAdapter().managed_session() as session:
-            _model = session.query(VoiceNoteModel.id).first()
-        return _model.id
+            self._voice_note_model: Union[VoiceNoteModel, None] = (
+                session.query(VoiceNoteModel)
+                .filter_by(id=self._voice_note_model.id)
+                .first()
+            )
+            if self._voice_note_model is not None:
+                return self._voice_note_model.id
+        return None
 
     def save(self):
         """Saves the note to the database"""
@@ -103,7 +110,7 @@ class VoiceNoteController:
             self._note_model.content = transcript  # type: ignore
             self._voice_note_model.service_used = f"openai/{settings.T2S_MODEL}"
             self._voice_note_model.transcribed = True  # type: ignore
-            #with DBAdapter().managed_session() as session:  # type: ignore
+            # with DBAdapter().managed_session() as session:  # type: ignore
             #    session.add_all([self._note_model, self._voice_note_model])
             #    logger.info("saved the transcibed content of the voice note to the database")
 
