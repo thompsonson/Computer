@@ -26,6 +26,15 @@ class DBAdapter:
     def __init__(self):
         self._session = None
 
+    def unmanaged_session(self, local_engine=engine) -> Session:
+        """Creates a session, commits at the end, rolls back on exception, removes.
+
+        Returns:
+            a session object, the receiving code is responsible for calling .begin(), .commit() or .rollback()
+        """
+        self._session = Session(bind=local_engine)
+        return self._session
+
     @contextmanager
     def managed_session(self, local_engine=engine) -> Generator[Session, None, None]:
         """Creates a session, commits at the end, rolls back on exception, removes.
@@ -45,6 +54,4 @@ class DBAdapter:
         else:
             self._session.commit()  # type: ignore
         finally:
-            # Note: close() unbinds model objects, but keeps the DB connection.
-            self._session.close()  # type: ignore
-            # TODO: does anything else need to be done to cleanup the session?
+            self._session.close() # type: ignore

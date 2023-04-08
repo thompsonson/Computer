@@ -3,7 +3,7 @@ import tempfile
 import os
 import subprocess
 import logging
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 import settings
 
@@ -58,15 +58,16 @@ class NoteController:
 class VoiceNoteController:
     """class for handling voice notes"""
 
-    def __init__(self):
-        self._voice_note_model: VoiceNoteModel
-        self._note_model: NoteModel
+    #def __init__(self):
+    #    self._voice_note_model: VoiceNoteModel
+    #    self._note_model: NoteModel
 
     def __str__(self) -> str:
         return f"Voice Note ID: {self._voice_note_model.id!r} Note:\n{self._voice_note_model.note!r}"
 
-    def new(self, source: str, file_location: str, file_encoding: str):
+    def __init__(self, source: str, file_location: str, file_encoding: str):
         """sets the model for the controller"""
+        self.session = DBAdapter().unmanaged_session()
         self._note_model = NoteModel(source=source)
         self._voice_note_model = VoiceNoteModel(
             file_location=file_location,
@@ -75,21 +76,48 @@ class VoiceNoteController:
             note=self._note_model,
         )
         self._transcribe()
-        with DBAdapter().managed_session() as session:  # type: ignore
-            session.add_all([self._note_model, self._voice_note_model])
-            logger.info("new added the voice note to the database")
+        self.session.begin()
+        self.session.add_all([self._note_model, self._voice_note_model])
+        self.session.commit()
+        logger.info("new added the voice note (id: %s) to the database", self._voice_note_model.id)
+        self.voice_note_id = self._voice_note_model.id
+        self._note_id = self._note_model.id
 
     def fully_load_voicenote(self) -> Optional[int]:
         """gets the id for the controller's voice note model"""
         with DBAdapter().managed_session() as session:
-            self._voice_note_model: Union[VoiceNoteModel, None] = (
+            self._voice_note_model = (
                 session.query(VoiceNoteModel)
                 .filter_by(id=self._voice_note_model.id)
                 .first()
             )
-            if self._voice_note_model is not None:
-                return self._voice_note_model.id
-        return None
+            return self._voice_note_model.id
+
+    def get_voice_note_info(self) -> Optional[Tuple[int, str, int]]:
+        """Returns the voice_note_id, note_content, and note_id for the given voice_note_id"""
+        with DBAdapter().managed_session() as session:
+            # Query for the VoiceNoteModel instance with the given id
+            logger.info(f"voice_note_id: {self.voice_note_id}")
+            voice_note_model = (
+                session.query(VoiceNoteModel)
+                .filter_by(id=self.voice_note_id)
+                .first()
+            )
+            logger.info(f"voice_note_model: {voice_note_model}")
+            if voice_note_model is None:
+                return None
+            voice_note_id = voice_note_model.id
+
+            # Extract the required values from the VoiceNoteModel and its associated NoteModel
+            note_content = (
+                voice_note_model.note.content
+                if voice_note_model.note is not None
+                else None
+            )
+            note_id = (
+                voice_note_model.note.id if voice_note_model.note is not None else None
+            )
+            return voice_note_id, note_content, note_id # type: ignore
 
     def save(self):
         """Saves the note to the database"""
