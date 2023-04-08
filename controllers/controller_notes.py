@@ -6,13 +6,11 @@ import logging
 
 import openai
 
-from models.model_notes import NoteModel, VoiceNoteModel, notes_base
+from models.model_notes import NoteModel, VoiceNoteModel
 import controllers.controller_openai as controller_openai
 from exceptions import CommandException
 
 from DBAdapter import DBAdapter
-
-import settings
 
 logger = logging.getLogger(__name__)
 
