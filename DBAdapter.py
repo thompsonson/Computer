@@ -36,7 +36,7 @@ class DBAdapter:
         """
         try:
             self._session = Session(bind=local_engine)
-            #self._session = sessionmaker()
+            # self._session = sessionmaker()
             self._session.begin()
             yield self._session
         except:

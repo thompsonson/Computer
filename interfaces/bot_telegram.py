@@ -57,18 +57,17 @@ async def new_message_handler(event):
             "downloaded the voice message: downloads/voicenotes/%s.ogg",
             event.message.id,
         )
-        voice_note = VoiceNoteController(
-            VoiceNoteModel(
-                source=f"telegram/{event.message.id}",
-                file_location=f"downloads/voicenotes/{event.message.id}.ogg",
-                file_encoding="ogg",
-            )
+        voice_note = VoiceNoteController()
+        voice_note.new(
+            source=f"telegram/{event.message.id}",
+            file_location=f"downloads/voicenotes/{event.message.id}.ogg",
+            file_encoding="ogg",
         )
-        voice_note.transcribe()
-        voice_note.save()  # type: ignore
+        #voice_note.transcribe()
+        #voice_note.save()  # type: ignore
         await message_store.send(
             event,
-            f"Note ID: {voice_note.model.id} Content:\n{voice_note.model.content}",
+            str(voice_note.get_id()),
         )
     else:
         await event.respond(event.text)
