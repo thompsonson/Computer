@@ -22,4 +22,6 @@ API_HASH = os.getenv("TELEGRAM_APP_HASH")
 TELEGRAM_SESSION = "telegram.session"
 
 # database related
-DATABASE = "sqlite:///database.db"
+SQLA_CONNECTION_STRING = "sqlite:///database.db"
+SQLA_ECHO = False
+SQLA_FUTURE = True

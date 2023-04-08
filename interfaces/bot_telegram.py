@@ -5,14 +5,14 @@ import re
 from telethon import TelegramClient, events, functions, types
 import settings
 
-from models.model_notes import VoiceNoteModel, Base
+from models.model_notes import VoiceNoteModel, notes_base
 from controllers.controller_notes import VoiceNoteController, NoteController
 from controllers.controller_bot import MessageSend
 from controllers.controller_openai import correct_text, translate_text
 
 from main import bot
 
-from dal import create_engine_and_session
+from DBAdapter import create_engine_and_session
 
 logger = logging.getLogger(__name__)
 message_store = MessageSend()
@@ -70,10 +70,7 @@ async def echo(event):
             )
         )
         voice_note.transcribe()
-        # await event.respond(f"id:{voice_note_data.id}\n{voice_note_data.content}")
-        session = create_engine_and_session(Base)
-        session.add(voice_note.model)
-        session.commit()
+        voice_note.save()  # type: ignore
         await message_store.send(
             event,
             f"Note ID: {voice_note.model.id} Content:\n{voice_note.model.content}",
