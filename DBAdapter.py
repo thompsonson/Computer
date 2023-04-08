@@ -24,7 +24,7 @@ class DBAdapter:
     """A class that holds the logic for accessing the database"""
 
     @contextmanager
-    def session(self, local_engine = engine) -> Generator [sessionmaker, None, None]:
+    def session(self, local_engine=engine) -> Generator[sessionmaker, None, None]:
         """Creates a session, commits at the end, rolls back on exception, removes.
 
         Yields:

@@ -26,7 +26,7 @@ class NoteController:
         if "note_model" in kwargs:
             self.model = kwargs["note_model"]
         elif "id" in kwargs:
-            with DBAdapter.session() as session: # type: ignore
+            with DBAdapter.session() as session:  # type: ignore
                 self.model = session.query(NoteModel).filter_by(id=kwargs["id"]).first()  # type: ignore
                 if not self.model:
                     raise ValueError("No note with that id")
@@ -35,8 +35,8 @@ class NoteController:
 
     def save(self):
         """Saves the note to the database"""
-        with DBAdapter.session() as session: # type: ignore
-            session.add(self.model) # type: ignore
+        with DBAdapter.session() as session:  # type: ignore
+            session.add(self.model)  # type: ignore
 
     async def generate_additonal_info(self):
         "Calls GPT to generate topics, summary and sentiment"

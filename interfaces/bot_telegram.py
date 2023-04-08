@@ -70,7 +70,7 @@ async def echo(event):
             )
         )
         voice_note.transcribe()
-        voice_note.save() # type: ignore
+        voice_note.save()  # type: ignore
         await message_store.send(
             event,
             f"Note ID: {voice_note.model.id} Content:\n{voice_note.model.content}",
