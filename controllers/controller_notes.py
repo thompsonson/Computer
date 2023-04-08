@@ -6,11 +6,11 @@ import logging
 
 import openai
 
-from models.model_notes import NoteModel, VoiceNoteModel, Base
+from models.model_notes import NoteModel, VoiceNoteModel, notes_base
 import controllers.controller_openai as controller_openai
 from exceptions import CommandException
 
-from dal import create_engine_and_session
+from DBAdapter import DBAdapter
 
 import settings
 
@@ -26,14 +26,17 @@ class NoteController:
         if "note_model" in kwargs:
             self.model = kwargs["note_model"]
         elif "id" in kwargs:
-            self.session = create_engine_and_session(Base)
-            self.model = (
-                self.session.query(NoteModel).filter_by(id=kwargs["id"]).first()
-            )
-            if not self.model:
-                raise ValueError("No note with that id")
+            with DBAdapter.session() as session: # type: ignore
+                self.model = session.query(NoteModel).filter_by(id=kwargs["id"]).first()  # type: ignore
+                if not self.model:
+                    raise ValueError("No note with that id")
         else:
             raise ValueError("No note model or id provided")
+
+    def save(self):
+        """Saves the note to the database"""
+        with DBAdapter.session() as session: # type: ignore
+            session.add(self.model) # type: ignore
 
     async def generate_additonal_info(self):
         "Calls GPT to generate topics, summary and sentiment"

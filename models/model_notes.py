@@ -3,10 +3,10 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 
-Base = declarative_base()
+notes_base = declarative_base()
 
 
-class NoteModel(Base):
+class NoteModel(notes_base):
     """Data class for notes"""
 
     __tablename__ = "note_base"
