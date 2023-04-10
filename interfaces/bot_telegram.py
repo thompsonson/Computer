@@ -2,7 +2,7 @@
 
 import logging
 import re
-from telethon import TelegramClient, events, functions, types
+from telethon import TelegramClient, events, functions, types, buttons
 import settings
 
 from models.model_notes import VoiceNoteModel, notes_base
@@ -64,10 +64,23 @@ async def new_message_handler(event):
         )
         # voice_note.transcribe()
         # voice_note.save()  # type: ignore
-        voice_note_id, notce_content, note_id = voice_note.get_voice_note_info() # type: ignore
+        voice_note_id, notce_content, note_id = voice_note.get_voice_note_info()  # type: ignore
         await message_store.send(
             event,
             f"Voice Note ID: {voice_note_id!r} | Note ID: {note_id!r}\n\n Note:\n{notce_content!r}",
         )
+        await event.respond(
+            "What would you like to do with this voice note?",
+            buttons=_options(),
+        )
     else:
         await event.respond(event.text)
+
+
+def _options():
+    """Options for the Telegram bot."""
+    return [
+        buttons.Button.inline("Correct", data="correct"),
+        buttons.Button.inline("Translate", data="translate"),
+        buttons.Button.inline("Enrich", data="enrich"),
+    ]

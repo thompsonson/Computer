@@ -7,7 +7,7 @@ import settings
 
 logger = logging.getLogger(__name__)
 
-openai.api_key = settings.API_KEY
+openai.api_key = settings.OPENAI_API_KEY
 
 
 async def _completion(text: str) -> str:
