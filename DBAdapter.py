@@ -54,4 +54,4 @@ class DBAdapter:
         else:
             self._session.commit()  # type: ignore
         finally:
-            self._session.close() # type: ignore
+            self._session.close()  # type: ignore

@@ -11,7 +11,7 @@ logging.basicConfig(
 )
 
 # OpenAI secret Key
-API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 # Models: text-davinci-003,text-curie-001,text-babbage-001,text-ada-001
 GPT_MODEL = "text-davinci-003"
 T2S_MODEL = "whisper-1"
@@ -25,3 +25,6 @@ TELEGRAM_SESSION = "telegram.session"
 SQLA_CONNECTION_STRING = "sqlite:///database.db"
 SQLA_ECHO = False
 SQLA_FUTURE = True
+
+# TOOLS
+SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")
