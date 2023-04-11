@@ -8,13 +8,20 @@ import settings
 from models.model_notes import VoiceNoteModel, notes_base
 from controllers.controller_notes import VoiceNoteController, NoteController
 from controllers.controller_bot import MessageSend
-from controllers.controller_openai import correct_text, translate_text
+from controllers.controller_openai import correct_text, translate_text, corriger_text
 
 
 logger = logging.getLogger(__name__)
 message_store = MessageSend()
 
 logger.info("Hello World")
+
+
+async def corriger_handler(event):
+    """Use OpenAI Da Vinci to correct the previous message"""
+    response = await corriger_text(message_store.get_last())
+    await message_store.send(event, response.choices[0].text)  # type: ignore
+    raise events.StopPropagation
 
 
 async def correct_handler(event):
@@ -82,5 +89,5 @@ def _options():
     return [
         Button.inline("Correct", data=b"correct"),
         Button.inline("Translate", data=b"translate"),
-        Button.inline("Enrich", data=b"corriger"),
+        Button.inline("Corriger", data=b"corriger"),
     ]
