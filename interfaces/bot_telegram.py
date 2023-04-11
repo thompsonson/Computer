@@ -2,7 +2,7 @@
 
 import logging
 import re
-from telethon import TelegramClient, events, functions, types, buttons
+from telethon import TelegramClient, events, functions, types, Button
 import settings
 
 from models.model_notes import VoiceNoteModel, notes_base
@@ -80,7 +80,7 @@ async def new_message_handler(event):
 def _options():
     """Options for the Telegram bot."""
     return [
-        buttons.Button.inline("Correct", data="correct"),
-        buttons.Button.inline("Translate", data="translate"),
-        buttons.Button.inline("Enrich", data="enrich"),
+        Button.inline("Correct", data=b"correct"),
+        Button.inline("Translate", data=b"translate"),
+        Button.inline("Enrich", data=b"corriger"),
     ]
