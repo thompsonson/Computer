@@ -29,31 +29,38 @@ async def generate_additonal_info(note_model: NoteModel) -> None:
         f"please return a name, topic, summary (of no more than one sentance), and sentiment for the following note in json:\n\n{note_model.content}"
     )
     # TODO: verify the text is in json and then parse it into the model
+    logger.info(response)
+    return response  # type: ignore
 
 
 async def correct_text(text: str) -> str:
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=f"please correct the follow text:\n\n{text}",
-        temperature=0,
-        max_tokens=60,
-        top_p=1.0,
-        frequency_penalty=0.0,
-        presence_penalty=0.0,
+    response = await _completion(
+        f"please correct any grammaratical  the follow text:\n\n{text}"
+    )
+    logger.info(response)
+    return response  # type: ignore
+
+
+async def corriger_text(text: str) -> str:
+    response = await _completion(
+        f"""
+Bonjour! Below is a transcription of French I have spoken. 
+I would like to know if there is a way to improve my French. Can you suggest any of the following?
+1. any grammar mistakes?
+2. alternative vocabulary?
+3. idiomatic expressions and common phrases to replace how I spoke?
+4. any tips for proper sentence structure?
+-----------
+{text}
+"""
     )
     logger.info(response)
     return response  # type: ignore
 
 
 async def translate_text(text: str) -> str:
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=f"please translate the following text to/from english/french:\n\n{text}",
-        temperature=0,
-        max_tokens=60,
-        top_p=1.0,
-        frequency_penalty=0.0,
-        presence_penalty=0.0,
+    response = await _completion(
+        f"please translate the following text to/from english/french:\n\n{text}"
     )
     logger.info(response)
     return response  # type: ignore
