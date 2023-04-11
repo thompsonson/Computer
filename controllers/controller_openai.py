@@ -28,7 +28,7 @@ async def _completion(text: str) -> str:
         model="text-davinci-003",
         prompt=text,
         temperature=0,
-        max_tokens=60,
+        max_tokens=250,
         top_p=1.0,
         frequency_penalty=0.0,
         presence_penalty=0.0,
