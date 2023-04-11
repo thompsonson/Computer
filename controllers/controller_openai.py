@@ -88,12 +88,12 @@ async def corriger_text(text: str) -> str:
     logger.info("corriger_text %s", text)
     response = await _completion(
         f"""Bonjour! Vous trouverez ci-dessous une transcription du français que j'ai parlé.
-J'aimerais savoir s'il existe un moyen d'améliorer mon français. Par example:
-1. des erreurs de grammaire?
-2. vocabulaire alternatif?
-3. des expressions idiomatiques et des phrases courantes pour remplacer ma façon de parler?
-4. Des conseils pour une structure de prix appropriée?
-Pouvez-vous suggérer l'un des éléments suivants?
+Dites-moi s'il y a des défauts ou des améliorations, par exemple :
+1. erreurs grammaticales
+2. vocabulaire alternatif
+3. Idiomes et phrases courantes pour remplacer ma façon de parler
+4. Conseils pour une structure tarifaire appropriée
+Lister les corrections en puces, la retranscription est du coup:
 -----------
 {text}
 """
