@@ -29,7 +29,7 @@ bot.add_event_handler(enrich_handler, events.NewMessage(pattern="/enrich"))
 bot.add_event_handler(correct_handler, events.CallbackQuery(data=b"correct"))
 bot.add_event_handler(translate_handler, events.CallbackQuery(data=b"translate"))
 bot.add_event_handler(enrich_handler, events.CallbackQuery(data=b"enrich"))
-bot.add_event_handler(enrich_handler, events.CallbackQuery(data=b"corriger"))
+bot.add_event_handler(corriger_handler, events.CallbackQuery(data=b"corriger"))
 
 bot.add_event_handler(new_message_handler, events.NewMessage(outgoing=False))
 
