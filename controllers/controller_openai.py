@@ -28,7 +28,7 @@ async def _completion(text: str) -> str:
         model="text-davinci-003",
         prompt=text,
         temperature=0,
-        max_tokens=60,
+        max_tokens=250,
         top_p=1.0,
         frequency_penalty=0.0,
         presence_penalty=0.0,
@@ -47,6 +47,7 @@ async def generate_additonal_info(note_model: NoteModel) -> None:
     Returns:
         None
     """
+    logger.info("generate_additonal_info")
     response = await _completion(
         f"please return a name, topic, summary (of no more than one sentance), and sentiment for the following note in json:\n\n{note_model.content}"
     )
@@ -65,6 +66,7 @@ async def correct_text(text: str) -> str:
     Returns:
         str: Text with corrected grammar.
     """
+    logger.info("correct_text")
     response = await _completion(
         f"please correct any grammaratical  the follow text:\n\n{text}"
     )
@@ -82,14 +84,15 @@ async def corriger_text(text: str) -> str:
     Returns:
         str: Text with suggested improvements.
     """
+    logger.info("corriger_text")
     response = await _completion(
-        f"""
-Bonjour! Below is a transcription of French I have spoken. 
-I would like to know if there is a way to improve my French. Can you suggest any of the following?
-1. any grammar mistakes?
-2. alternative vocabulary?
-3. idiomatic expressions and common phrases to replace how I spoke?
-4. any tips for proper sentence structure?
+        f"""Bonjour! Vous trouverez ci-dessous une transcription du français que j'ai parlé.
+J'aimerais savoir s'il existe un moyen d'améliorer mon français. 
+Pouvez-vous suggérer l'un des éléments suivants ?
+1. des erreurs de grammaire ?
+2. vocabulaire alternatif ?
+3. des expressions idiomatiques et des phrases courantes pour remplacer ma façon de parler ?
+4. Des conseils pour une structure de prix appropriée ?
 -----------
 {text}
 """
@@ -125,6 +128,7 @@ def transcribe_speech(voice_file) -> str:
     Returns:
         str: Transcribed text.
     """
+    logger.info("transcribe_speech")
     audio_file = open(voice_file, "rb")
     response = openai.Audio.transcribe(settings.T2S_MODEL, audio_file)
     logger.info("transcript: %s", response.text)  # type: ignore
