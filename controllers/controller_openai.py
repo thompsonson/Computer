@@ -24,6 +24,7 @@ async def _completion(text: str) -> str:
     Returns:
         str: Generated text completion.
     """
+    logger.info(text)
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=text,
