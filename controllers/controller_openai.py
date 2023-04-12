@@ -5,6 +5,9 @@ This module provides utility functions using OpenAI's API.
 import logging
 import openai
 
+from langchain import OpenAI, LLMChain, PromptTemplate
+from langchain.memory import ConversationBufferWindowMemory
+
 from models.model_notes import NoteModel
 
 import settings
@@ -34,7 +37,6 @@ async def _completion(text: str) -> str:
         frequency_penalty=0.0,
         presence_penalty=0.0,
     )
-    logger.info(response)
     return response  # type: ignore
 
 
@@ -87,15 +89,16 @@ async def corriger_text(text: str) -> str:
     """
     logger.info("corriger_text %s", text)
     response = await _completion(
-        f"""Bonjour! Vous trouverez ci-dessous une transcription du français que j'ai parlé.
-Dites-moi s'il y a des défauts ou des améliorations, par exemple :
-1. erreurs grammaticales
-2. vocabulaire alternatif
-3. Idiomes et phrases courantes pour remplacer ma façon de parler
-4. Conseils pour une structure tarifaire appropriée
-Lister les corrections en puces, la retranscription est du coup:
+        f"""
+Bonjour ! Vous trouverez ci-dessous une transcription de ce que j'ai dit, en français.
+Dites-moi s'il y a des défauts ou des améliorations possibles, par exemple :
+1. Erreurs grammaticales
+2. Vocabulaire alternatif
+3. Idiomes et phrases courantes pour améliorer ma façon de parler
+4. Conseils pour une structure syntaxique appropriée
+Listez les corrections dans une liste à puces. La retranscription est:
 -----------
-{text}
+{text}        
 """
     )
     logger.info(response)
@@ -135,3 +138,210 @@ def transcribe_speech(voice_file) -> str:
     response = openai.Audio.transcribe(settings.T2S_MODEL, audio_file)
     logger.info("transcript: %s", response.text)  # type: ignore
     return response.text  # type: ignore
+
+
+class CodeReview:
+    """
+    Code Review Chat
+
+    This is a chatbot that provides feedback on code quality, efficiency, and readability.
+
+    Example:
+        >>> code_review_chat = CodeReview()
+        >>> code_review_chat.code_review_completion("def hello():\n    print('hello')\n")
+
+    """
+
+    def __init__(self):
+        template = """
+You are a kind, truthful Senior Engineer with multiple years experience writting and reviewing code. 
+You have a keen eye for detail and are able to provide constructive feedback to your peers.
+You like to offer your reviews in a teacher like style.    
+
+Human: Hey, I have some code to review. Are you free?
+Senior Engineer: Sure, I'm free.
+Human: Excellent. Please review this Python code and provide feedback on its quality, efficiency, and readability. 
+Specifically, can you identify any potential bugs, performance issues, or design flaws? 
+Additionally, please suggest any improvements or optimizations that could be made to the code.
+----------------
+{history}
+Human: {human_input}
+Assistant:"""
+        prompt = PromptTemplate(
+            input_variables=["history", "human_input"], template=template
+        )
+
+        chatgpt_chain = LLMChain(
+            llm=OpenAI(temperature=0),  # type: ignore
+            prompt=prompt,
+            verbose=True,
+            memory=ConversationBufferWindowMemory(k=10),
+        )
+
+        self.chatgpt_chain = chatgpt_chain
+
+    def code_review_completion(self, text):
+        """
+        Provide feedback on its quality, efficiency, and readability.
+        Is asked to identify bugs, performance issues, and design flaws.
+        The feedback should include improvements or optimizations.
+
+        Args:
+            text (str): Code to review.
+
+        Returns:
+            str: Review of the code.
+        """
+        response = self.chatgpt_chain.predict(human_input=text)  # type: ignore
+        return response
+
+
+def code_review_chat(text):
+    """
+    Provide feedback on its quality, efficiency, and readability.
+    Is asked to identify bugs, performance issues, and design flaws.
+    The feedback should include improvements or optimizations.
+
+    Args:
+        text (str): Code to review.
+
+    Returns:
+        str: Review of the code.
+    """
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": """
+You are a kind Senior Engineer with multiple years experience writting and reviewing code. 
+You have a keen eye for detail and are able to provide constructive feedback to your peers.
+You like to offer your reviews in a teacher like style.
+Feedback is arranged in the format:
+# Design and Readability:
+- ...
+# Potential Bugs:
+- ...
+# Performance:
+- ...
+# Possible Improvements:
+- ...
+""",
+            },
+            {
+                "role": "user",
+                "content": "Hey, I have some code to review. Are you free?",
+            },
+            {"role": "assistant", "content": "Sure, I'm free."},
+            {
+                "role": "user",
+                "content": f"""
+Excellent. Please review this Python code and provide feedback on its quality, efficiency, and readability. 
+Specifically, can you identify any potential bugs, performance issues, or design flaws? 
+Additionally, please suggest any improvements or optimizations that could be made to the code.
+----------------
+{text}
+""",
+            },
+        ],
+    )
+
+    logger.info("tokens used: %s", response["usage"]["total_tokens"])  # type: ignore
+    logger.info(response)
+    return response
+
+
+def code_review_file_summary(text):
+    """
+    Summarize the file so it can be used in a code review summary.
+
+    Args:
+        text (str): Code to review.
+
+    Returns:
+        str: Summary of the code.
+    """
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": """
+You are a kind Senior Engineer with multiple years experience writting and reviewing code. 
+You have a keen eye for detail and are able to provide constructive feedback to your peers.
+Part of your approach is to summarize the findings in a code review summary. 
+You summarize each file and then review the summaries to generate a final summary.
+""",
+            },
+            {
+                "role": "user",
+                "content": "Hey, I have some code to review. Are you free?",
+            },
+            {"role": "assistant", "content": "Sure, I'm free."},
+            {
+                "role": "user",
+                "content": f"""
+Excellent. Please review this Python code and provide feedback on its quality, efficiency, and readability. 
+Specifically, summarize any potential bugs, performance issues, or design flaws. 
+Additionally, summarize any improvements or optimizations that could be made to the code.
+----------------
+{text}
+""",
+            },
+        ],
+    )
+
+    logger.info("tokens used: %s", response["usage"]["total_tokens"])  # type: ignore
+    logger.info(response)
+    return response
+
+
+def code_review_summary(text):
+    """
+    A summary od summaries.
+
+    Args:
+        text (str): Summaries of code reviews.
+
+    Returns:
+        str: Summary of the summaries.
+    """
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": """
+You are a truthful Senior Engineer with multiple years experience writting and reviewing code. 
+Part of your approach is to summarize the findings in a code review summary. 
+Feedback is arranged in the format:
+# Design and Readability:
+- ...
+# Potential Bugs:
+- ...
+# Performance:
+- ...
+# Possible Improvements:
+- ...
+""",
+            },
+            {
+                "role": "user",
+                "content": "Hey, I have some summaries of code reviews. Are you free to summarize them?",
+            },
+            {"role": "assistant", "content": "Sure, I'm free."},
+            {
+                "role": "user",
+                "content": f"""
+Excellent. Please summarize this to provide feedback on its quality, efficiency, and readability. 
+This text is a concatenation of the file summaries.
+----------------
+{text}
+""",
+            },
+        ],
+    )
+
+    logger.info("tokens used: %s", response["usage"]["total_tokens"])  # type: ignore
+    logger.info(response)
+    return response
