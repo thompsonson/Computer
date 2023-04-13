@@ -40,7 +40,7 @@ C'est n'importe quoi l'advance OpenAI a fait avec GPT-4.
 
     test_fnc = FrenchNoteController(sample_message)
     assert test_fnc._note_id == sample_message["note_id"]  # type: ignore
-    assert test_fnc._voicenote_id == sample_message["voice_note_id"]  # type: ignore
+    assert test_fnc._voice_note_id == sample_message["voice_note_id"]  # type: ignore
     assert test_fnc._message_text == sample_message["message"]  # type: ignore
 
     test_response = test_fnc.corriger_message()

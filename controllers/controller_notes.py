@@ -188,7 +188,7 @@ class FrenchNoteController:
         # handler the inputted message
         self._message = message
         self._note_id = message["note_id"]
-        self._voicenote_id = message["voice_note_id"]
+        self._voice_note_id = message["voice_note_id"]
         self._message_text = message["message"]
         logger.info("message: %s", self._message)
         # set up the DB session
