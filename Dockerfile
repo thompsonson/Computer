@@ -1,6 +1,9 @@
 # Build image
 FROM python:3.10-buster
 
+# needs to run before the poetry install as there a "dependancy issues" (not for parts this project uses though)
+RUN pip install langchain
+
 ENV POETRY_VERSION=1.3.2 \
     # Do not ask any interactive question
     POETRY_NO_INTERACTION=1
