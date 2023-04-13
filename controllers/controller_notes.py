@@ -298,5 +298,5 @@ YOUR RESPONSE:
 
     def save(self):
         """Saves the note to the database"""
-        self._session.add_all(self._french_note_model, self._note_model, self._voice_note_model)
+        self._session.add_all([self._french_note_model, self._note_model, self._voice_note_model])
         self._session.commit()
