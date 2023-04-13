@@ -6,7 +6,11 @@ from telethon import TelegramClient, events, functions, types, Button
 import settings
 
 from models.model_notes import VoiceNoteModel, notes_base
-from controllers.controller_notes import VoiceNoteController, NoteController
+from controllers.controller_notes import (
+    VoiceNoteController,
+    NoteController,
+    FrenchNoteController,
+)
 from controllers.controller_bot import MessageSend
 from controllers.controller_openai import correct_text, translate_text, corriger_text
 
@@ -19,8 +23,9 @@ logger.info("Hello World")
 
 async def corriger_handler(event):
     """Use OpenAI Da Vinci to correct the previous message"""
-    response = await corriger_text(message_store.get_last())
-    await message_store.send(event, response.choices[0].text)  # type: ignore
+    french_note_controller = FrenchNoteController(message_store.get_last())
+    response = await french_note_controller.corriger_message()
+    await message_store.send(event, response["corriger"])  # type: ignore
     raise events.StopPropagation
 
 
@@ -73,8 +78,7 @@ async def new_message_handler(event):
         # voice_note.save()  # type: ignore
         voice_note_id, notce_content, note_id = voice_note.get_voice_note_info()  # type: ignore
         await message_store.send(
-            event,
-            f"Voice Note ID: {voice_note_id!r} | Note ID: {note_id!r}\n\n Note:\n{notce_content!r}",
+            event, notce_content, note_id=note_id, voicenote_id=voice_note_id
         )
         await event.respond(
             "What would you like to do with this voice note?",

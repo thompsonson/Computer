@@ -5,9 +5,13 @@ import subprocess
 import logging
 from typing import Optional, Tuple, Union
 
+from langchain.output_parsers import StructuredOutputParser, ResponseSchema
+from langchain.prompts import PromptTemplate
+from langchain.llms import OpenAI
+
 import settings
 
-from models.model_notes import NoteModel, VoiceNoteModel
+from models.model_notes import NoteModel, VoiceNoteModel, FrenchNoteModel
 import controllers.controller_openai as controller_openai
 from exceptions import CommandException
 
@@ -174,3 +178,121 @@ class VoiceNoteController:
         ]
         self._run_command(commands)  # type: ignore
         return mp3_file
+
+
+class FrenchNoteController:
+    """class for handler french notes"""
+
+    def __init__(self, message, session=None):
+        """sets the model for the controller"""
+        # handler the inputted message
+        self._message = message
+        self._note_id = message["note_id"]
+        self._voicenote_id = message["voice_note_id"]
+        self._message_text = message["message"]
+        logger.info("message: %s", self._message)
+        # set up the DB session
+        self._session = session or DBAdapter().unmanaged_session()
+        self._note_model = (
+            self._session.query(NoteModel).filter_by(id=self._note_id).first()
+        )
+        self._french_note_model = FrenchNoteModel(id=self._note_id)
+
+        # set up the LLM to use
+        self._llm = OpenAI(model_name=settings.GPT_MODEL, openai_api_key=settings.OPENAI_API_KEY)  # type: ignore
+
+        # set up the schema and outputparser for the LLM interaction (note some are commented out due to using too many tokens)
+        self._response_schemas = [
+            ResponseSchema(name="corriger", description="La transcription corrige"),
+            # ResponseSchema(name="erreurs", description="Les erreurs grammaticales"),
+            ResponseSchema(
+                name="vocabulaire", description="les vocabulaires alternatifs"
+            ),
+            # ResponseSchema(
+            #    name="idiomes",
+            #    description="Idiomes et phrases courantes pour améliorer ma façon de parler",
+            # ),
+            # ResponseSchema(
+            #    name="conseils",
+            #    description="Conseils pour une structure syntaxique appropriée",
+            # ),
+        ]
+
+        self._output_parser = StructuredOutputParser.from_response_schemas(
+            self._response_schemas
+        )
+
+    def _prepare_corriger_prompt(self) -> str:
+        """
+        Prepare the input prompt for the API request to correct and provide suggestions for the French text.
+
+        This method creates a prompt using response schemas, format instructions, and a template. The prompt is
+        then used as an input for the API request to get the corrected French text and suggestions.
+
+        Returns:
+            str: The prepared input prompt for the API request.
+        """
+
+        format_instructions = self._output_parser.get_format_instructions()
+        logger.info(format_instructions)
+
+        template = """
+Bonjour ! Vous trouverez ci-dessous une transcription de ce que j'ai dit, en français.
+Dites-moi s'il y a des défauts ou des améliorations possibles. 
+
+{format_instructions}
+
+% USER INPUT:
+{user_input}
+
+YOUR RESPONSE:
+    """
+
+        prompt = PromptTemplate(
+            input_variables=["user_input"],
+            partial_variables={"format_instructions": format_instructions},
+            template=template,
+        )
+
+        prompt_value = prompt.format(user_input=self._message_text)
+
+        logger.info(prompt_value)
+
+        return prompt_value
+
+    async def corriger_message(self):
+        """
+        Provide suggestions to improve French in the given text.
+
+        Args:
+            text (str): Text in French to provide suggestions for.
+
+        Returns:
+            str: Text with suggested improvements.
+        """
+        logger.info("parsable_corriger_text %s", self._message_text)
+
+        prompt = self._prepare_corriger_prompt()
+
+        llm_output = self._llm(str(prompt))
+
+        logger.info(llm_output)
+
+        response = self._output_parser.parse(llm_output)
+
+        logger.info(response)
+
+        self._french_note_model.corriger = response["corriger"]
+        self._french_note_model.vocabulaire = response["vocabulaire"]
+        # self._french_note_model.conseils = response["conseils"]
+        # self._french_note_model.erreurs = response["erreurs"]
+        # self._french_note_model.idiomes = response["idiomes"]
+
+        self.save()
+
+        return self._french_note_model
+
+    def save(self):
+        """Saves the note to the database"""
+        self._session.add(self._french_note_model)
+        self._session.commit()

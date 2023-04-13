@@ -5,7 +5,11 @@ This module provides utility functions using OpenAI's API.
 import logging
 import openai
 
-from models.model_notes import NoteModel
+from langchain.output_parsers import StructuredOutputParser, ResponseSchema
+from langchain.prompts import PromptTemplate
+from langchain.llms import OpenAI
+
+from models.model_notes import NoteModel, FrenchNoteModel
 
 import settings
 
@@ -86,14 +90,15 @@ async def corriger_text(text: str) -> str:
         str: Text with suggested improvements.
     """
     logger.info("corriger_text %s", text)
+
     response = await _completion(
-        f"""Bonjour! Vous trouverez ci-dessous une transcription du français que j'ai parlé.
-Dites-moi s'il y a des défauts ou des améliorations, par exemple :
-1. erreurs grammaticales
-2. vocabulaire alternatif
-3. Idiomes et phrases courantes pour remplacer ma façon de parler
-4. Conseils pour une structure tarifaire appropriée
-Lister les corrections en puces, la retranscription est du coup:
+        f"""Bonjour ! Vous trouverez ci-dessous une transcription de ce que j'ai dit, en français.
+Dites-moi s'il y a des défauts ou des améliorations possibles, par exemple :
+1. Erreurs grammaticales
+2. Vocabulaire alternatif
+3. Idiomes et phrases courantes pour améliorer ma façon de parler
+4. Conseils pour une structure syntaxique appropriée
+Listez les corrections dans une liste à puces. La retranscription est:
 -----------
 {text}
 """
@@ -135,3 +140,85 @@ def transcribe_speech(voice_file) -> str:
     response = openai.Audio.transcribe(settings.T2S_MODEL, audio_file)
     logger.info("transcript: %s", response.text)  # type: ignore
     return response.text  # type: ignore
+
+
+async def parsable_corriger_message(message: dict) -> FrenchNoteModel:
+    """
+    Provide suggestions to improve French in the given text.
+
+    Args:
+        text (str): Text in French to provide suggestions for.
+
+    Returns:
+        str: Text with suggested improvements.
+    """
+    logger.info("parsable_corriger_text %s", message)
+    llm = OpenAI(model_name="text-davinci-003", openai_api_key=settings.OPENAI_API_KEY)  # type: ignore
+    # sets the schema for how the LLM should respond
+    response_schemas = [
+        ResponseSchema(name="corriger", description="La transcription corrige"),
+        ResponseSchema(name="erreurs", description="Les erreurs grammaticales"),
+        ResponseSchema(name="vocabulaire", description="les vocabulaires alternatifs"),
+        ResponseSchema(
+            name="idiomes",
+            description="Idiomes et phrases courantes pour améliorer ma façon de parler",
+        ),
+        ResponseSchema(
+            name="conseils",
+            description="Conseils pour une structure syntaxique appropriée",
+        ),
+    ]
+
+    response_schemas_short = [
+        ResponseSchema(name="corriger", description="La transcription corrige"),
+        ResponseSchema(name="vocabulaire", description="les vocabulaires alternatifs"),
+        ResponseSchema(
+            name="conseils",
+            description="Conseils pour une structure syntaxique appropriée",
+        ),
+    ]
+
+    output_parser = StructuredOutputParser.from_response_schemas(response_schemas_short)
+
+    format_instructions = output_parser.get_format_instructions()
+    logger.info(format_instructions)
+
+    template = """
+Bonjour ! Vous trouverez ci-dessous une transcription de ce que j'ai dit, en français.
+Dites-moi s'il y a des défauts ou des améliorations possibles. 
+
+{format_instructions}
+
+% USER INPUT:
+{user_input}
+
+YOUR RESPONSE:
+"""
+
+    prompt = PromptTemplate(
+        input_variables=["user_input"],
+        partial_variables={"format_instructions": format_instructions},
+        template=template,
+    )
+
+    prompt_value = prompt.format(user_input=message["message"])
+
+    logger.info(prompt_value)
+
+    llm_output = llm(prompt_value)
+    logger.info(llm_output)
+
+    response = output_parser.parse(llm_output)
+
+    logger.info(response)
+
+    french_note = FrenchNoteModel(
+        note_id=message["note_id"],
+        corriger=response["corriger"],
+        vocabulaire=response["vocabulaire"],
+        conseils=response["conseils"],
+        erreurs=response["erreurs"],
+        idiomes=response["idiomes"],
+    )
+
+    return french_note

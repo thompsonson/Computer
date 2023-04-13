@@ -1,6 +1,6 @@
 """data models for notes"""
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Text, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import declarative_base, relationship, Mapped, mapped_column
 
 notes_base = declarative_base()
@@ -66,6 +66,26 @@ class VoiceNoteModel(NoteTypeModel):
 
     __mapper_args__ = {
         "polymorphic_identity": "voicenote",
+    }
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.note.id!r}) - {self.type!r}"
+
+
+class FrenchNoteModel(NoteTypeModel):
+    """class for French notes"""
+
+    __tablename__ = "note_frenchnote"
+
+    id: Mapped[int] = mapped_column(ForeignKey("note_type_base.id"), primary_key=True)
+    corriger: Mapped[str] = mapped_column(Text, nullable=True)
+    erreurs: Mapped[str] = mapped_column(Text, nullable=True)
+    vocabulaire: Mapped[str] = mapped_column(Text, nullable=True)
+    idiomes: Mapped[str] = mapped_column(Text, nullable=True)
+    conseils: Mapped[str] = mapped_column(Text, nullable=True)
+
+    __mapper_args__ = {
+        "polymorphic_identity": "frenchnote",
     }
 
     def __repr__(self):
