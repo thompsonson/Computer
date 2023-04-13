@@ -42,13 +42,13 @@ class MessageSend:
     def __init__(self):
         self.messages = []
 
-    async def send(self, event, message, note_id=None, voicenote_id=None):
+    async def send(self, event, message, note_id=None, voice_note_id=None):
         """send and add a message"""
         await event.respond(message)
         message_info = {
             "message": message,
             "note_id": note_id,
-            "voicenote_id": voicenote_id,
+            "voice_note_id": voice_note_id,
         }
         self.messages.append(message_info)
 

@@ -78,7 +78,7 @@ async def new_message_handler(event):
         # voice_note.save()  # type: ignore
         voice_note_id, notce_content, note_id = voice_note.get_voice_note_info()  # type: ignore
         await message_store.send(
-            event, notce_content, note_id=note_id, voicenote_id=voice_note_id
+            event, notce_content, note_id=note_id, voice_note_id=voice_note_id
         )
         await event.respond(
             "What would you like to do with this voice note?",

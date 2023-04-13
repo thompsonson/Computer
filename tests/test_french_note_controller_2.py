@@ -67,7 +67,7 @@ def test_init(sample_message, sample_session):
 
     assert controller._message == sample_message
     assert controller._note_id == sample_message["note_id"]
-    assert controller._voicenote_id == sample_message["voice_note_id"]
+    assert controller._voice_note_id == sample_message["voice_note_id"]
     assert controller._message_text == sample_message["message"]
     assert controller._session == sample_session
     assert controller._note_model is not None
@@ -96,7 +96,7 @@ def test_corriger_message(
     controller = FrenchNoteController(sample_message)
 
     assert controller._note_id == sample_message["note_id"]
-    assert controller._voicenote_id == sample_message["voice_note_id"]
+    assert controller._voice_note_id == sample_message["voice_note_id"]
     assert controller._message_text == sample_message["message"]
     assert controller._note_model == sample_note_model
     assert controller._session == mock_session
