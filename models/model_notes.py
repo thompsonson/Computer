@@ -55,8 +55,8 @@ class VoiceNoteModel(NoteTypeModel):
     """class for voice notes"""
 
     __tablename__ = "note_voicenote"
-
-    id: Mapped[int] = mapped_column(ForeignKey("note_type_base.id"), primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    note_id: Mapped[int] = mapped_column(ForeignKey("note_type_base.id"), unique=True)
     file_location: Mapped[str] = mapped_column(nullable=True)
     file_encoding: Mapped[str] = mapped_column(nullable=True)
     # processing
@@ -76,8 +76,8 @@ class FrenchNoteModel(NoteTypeModel):
     """class for French notes"""
 
     __tablename__ = "note_frenchnote"
-
-    id: Mapped[int] = mapped_column(ForeignKey("note_type_base.id"), primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    note_id: Mapped[int] = mapped_column(ForeignKey("note_type_base.id"), unique=True)
     corriger: Mapped[str] = mapped_column(Text, nullable=True)
     erreurs: Mapped[str] = mapped_column(Text, nullable=True)
     vocabulaire: Mapped[str] = mapped_column(Text, nullable=True)
