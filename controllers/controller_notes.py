@@ -197,7 +197,9 @@ class FrenchNoteController:
             self._session.query(NoteModel).filter_by(id=self._note_id).first()
         )
         self._voice_note_model = (
-            self._session.query(VoiceNoteModel).filter_by(id=self._voice_note_id).first()
+            self._session.query(VoiceNoteModel)
+            .filter_by(id=self._voice_note_id)
+            .first()
         )
         self._french_note_model = FrenchNoteModel(id=self._note_id)
         self._french_note_model.note = self._voice_note_model.note
@@ -298,5 +300,7 @@ YOUR RESPONSE:
 
     def save(self):
         """Saves the note to the database"""
-        self._session.add_all([self._french_note_model, self._note_model, self._voice_note_model])
+        self._session.add_all(
+            [self._french_note_model, self._note_model, self._voice_note_model]
+        )
         self._session.commit()
