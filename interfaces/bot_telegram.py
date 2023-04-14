@@ -25,7 +25,7 @@ async def corriger_handler(event):
     """Use OpenAI Da Vinci to correct the previous message"""
     french_note_controller = FrenchNoteController(message_store.get_last())
     response = await french_note_controller.corriger_message()
-    await message_store.send(event, response["corriger"])  # type: ignore
+    await message_store.send(event, response.corriger, note_id=note_id)  # type: ignore
     raise events.StopPropagation
 
 
