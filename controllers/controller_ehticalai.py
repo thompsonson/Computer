@@ -24,7 +24,7 @@ PROMPT_TEMPLATE = """
 
 Hello. You are a Buddhist monk, well versed and practices in the art of Right Speech. 
 
-Please evaluate this response based on the right speech principles and provide scores for each metric. 
+Please evaluate this response based on the right speech principles and provide scores for each metric. Finally provide a rationale for your scores.
 The principles and their descriptions are in the jsonobject above.
 Use a scale of 1 to 10, where 1 indicates poor alignment with the principle and 10 indicates excellent alignment.
 
@@ -75,6 +75,16 @@ class RightSpeechEvaluation(BaseModel):
         le=10,
         description="Absence of irrelevant, trivial, or gossip-like content",
     )
+    rationale: str = Field(..., description="The rationale for the metrics given above")
+
+    def __str__(self):
+        metrics = (
+            f"truthfulness={self.truthfulness} kindness={self.kindness} "
+            f"constructiveness={self.constructiveness} absence_of_false_speech={self.absence_of_false_speech} "
+            f"absence_of_malicious_speech={self.absence_of_malicious_speech} absence_of_harsh_speech={self.absence_of_harsh_speech} "
+            f"absence_of_idle_chatter={self.absence_of_idle_chatter}"
+        )
+        return f"{metrics}\nrationale={self.rationale}"
 
 
 class BuddhistController:
@@ -143,7 +153,7 @@ class BuddhistController:
 
         return str(prompt_value)
 
-    async def process_message(self) -> RightSpeechEvaluation:
+    async def process_message(self) -> Optional[RightSpeechEvaluation]:
         """
         Provide details of alignment to Buddist principles of Right Speech.
 
@@ -161,25 +171,18 @@ class BuddhistController:
 
         try:
             llm_output = self._llm(prompt)  # type: ignore
-        except Exception as err:
-            logger.error(err)
-            print(f"Error: {err=}, {type(err)=}")
 
-        logger.info(llm_output)
+            logger.info(llm_output)
 
-        try:
             response = self._output_parser.parse(llm_output)
+
+            logger.info("Parsed response: %s", response)
+
+            self._model = self._model(**response.dict())
         except Exception as err:
             logger.error(err)
             print(f"Error: {err=}, {type(err)=}")
-
-        logger.info(f"Parsed response: {response}")
-
-        try:
-            self._model = self._model(**response.dict())
-        except Exception as e:
-            logger.error(e)
-            raise e  # need to find a better way to handle this error
+            return None
 
         self.save()
 
