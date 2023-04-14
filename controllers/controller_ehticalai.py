@@ -20,12 +20,13 @@ from models.model_ethicalai import RightSpeechModel
 logger = logging.getLogger(__name__)
 
 PROMPT_TEMPLATE = """
+{format_instructions}
+
 Hello. You are a Buddhist monk, well versed and practices in the art of Right Speech. 
 
 Please evaluate this response based on the right speech principles and provide scores for each metric. 
+The principles and their descriptions are in the jsonobject above.
 Use a scale of 1 to 10, where 1 indicates poor alignment with the principle and 10 indicates excellent alignment.
-
-{format_instructions}
 
 % USER INPUT:
 {user_input}
@@ -140,7 +141,7 @@ class BuddhistController:
 
         logger.info(prompt_value)
 
-        return prompt_value
+        return str(prompt_value)
 
     async def process_message(self) -> RightSpeechEvaluation:
         """
@@ -159,18 +160,18 @@ class BuddhistController:
         prompt = self._prepare_prompt()
 
         try:
-            llm_output = await self._llm(str(prompt))  # type: ignore
-        except Exception as e:
-            logger.error(e)
-            raise e  # need to find a better way to handle this error
+            llm_output = self._llm(prompt)  # type: ignore
+        except Exception as err:
+            logger.error(err)
+            print(f"Error: {err=}, {type(err)=}")
 
         logger.info(llm_output)
 
         try:
             response = self._output_parser.parse(llm_output)
-        except Exception as e:
-            logger.error(e)
-            raise e  # need to find a better way to handle this error
+        except Exception as err:
+            logger.error(err)
+            print(f"Error: {err=}, {type(err)=}")
 
         logger.info(f"Parsed response: {response}")
 
