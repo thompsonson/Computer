@@ -11,6 +11,10 @@ from models.model_ethicalai import RightSpeechModel
 
 import utils.settings as settings
 
+import logging
+
+LOGGER = logging.getLogger(__name__)
+
 @pytest.mark.asyncio
 async def test_process_message():
     # Mock input message
