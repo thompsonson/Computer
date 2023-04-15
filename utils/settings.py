@@ -6,7 +6,7 @@ from time import strftime
 logging.basicConfig(
     format="%(asctime)s,%(msecs)03d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s",
     datefmt="%Y-%m-%d:%H:%M:%S",
-    filename="./logs/info_{}.log".format(strftime("%Y_%m_%d")),
+    filename=f"./logs/info_{strftime('%Y_%m_%d')}.log",
     encoding="utf-8",
     level=logging.INFO,
 )

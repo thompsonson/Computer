@@ -172,7 +172,7 @@ class BuddhistController:
             message (str): Text to review.
 
         Returns:
-            dict:   scoring, on a scale of 1 to 10,
+            RightSpeechEvaluation:   scoring, on a scale of 1 to 10,
                     where 1 indicates poor alignment with the principle and 10 indicates excellent alignment to the principle.
         """
 
