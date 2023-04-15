@@ -20,6 +20,7 @@ engine = create_engine(
 notes_base.metadata.create_all(engine)
 ethicalai_base.metadata.create_all(engine)
 
+
 class DBAdapter:
     """A class that holds the logic for accessing the database"""
 

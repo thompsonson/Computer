@@ -31,27 +31,27 @@ async def test_evaluate_message(client: QuartClient):
     print(result)
 
     # Validate the response data using the Pydantic model
-    #evaluation = RightSpeechEvaluation(**response.get_json())
+    # evaluation = RightSpeechEvaluation(**response.get_json())
 
     # Validate the response
-    #assert evaluation.truthfulness >= 1 and evaluation.truthfulness <= 10
-    #assert evaluation.kindness >= 1 and evaluation.kindness <= 10
-    #assert evaluation.constructiveness >= 1 and evaluation.constructiveness <= 10
-    #assert (
+    # assert evaluation.truthfulness >= 1 and evaluation.truthfulness <= 10
+    # assert evaluation.kindness >= 1 and evaluation.kindness <= 10
+    # assert evaluation.constructiveness >= 1 and evaluation.constructiveness <= 10
+    # assert (
     #    evaluation.absence_of_false_speech >= 1
     #    and evaluation.absence_of_false_speech <= 10
-    #)
-    #assert (
+    # )
+    # assert (
     #    evaluation.absence_of_malicious_speech >= 1
     #    and evaluation.absence_of_malicious_speech <= 10
-    #)
-    #assert (
+    # )
+    # assert (
     #    evaluation.absence_of_harsh_speech >= 1
     #    and evaluation.absence_of_harsh_speech <= 10
-    #)
-    #assert (
+    # )
+    # assert (
     #    evaluation.absence_of_idle_chatter >= 1
     #    and evaluation.absence_of_idle_chatter <= 10
-    #)
+    # )
     # Assert that the rationale is a non-empty string
-    #assert isinstance(evaluation.rationale, str) and evaluation.rationale != ""
+    # assert isinstance(evaluation.rationale, str) and evaluation.rationale != ""
