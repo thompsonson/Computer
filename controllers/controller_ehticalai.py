@@ -12,9 +12,9 @@ from langchain.llms import OpenAI
 from langchain.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field, validator
 
-import settings
+import utils.settings as settings
 
-from DBAdapter import DBAdapter
+from utils.DBAdapter import DBAdapter
 from models.model_ethicalai import RightSpeechModel
 
 logger = logging.getLogger(__name__)
@@ -75,7 +75,8 @@ class RightSpeechEvaluation(BaseModel):
         le=10,
         description="Absence of irrelevant, trivial, or gossip-like content",
     )
-    rationale: str = Field(..., description="The rationale for the metrics given above")
+    rationale: str = Field(...,
+                           description="The rationale for the metrics given above")
 
     def __str__(self):
         metrics = (
@@ -84,7 +85,7 @@ class RightSpeechEvaluation(BaseModel):
             f"absence_of_malicious_speech={self.absence_of_malicious_speech} absence_of_harsh_speech={self.absence_of_harsh_speech} "
             f"absence_of_idle_chatter={self.absence_of_idle_chatter}"
         )
-        return f"{metrics}\nrationale={self.rationale}"
+        return f"{metrics}\n\nrationale={self.rationale}"
 
 
 class BuddhistController:
@@ -205,7 +206,8 @@ class BuddhistController:
         finally:
             end_time = time.perf_counter()
             processing_time = end_time - start_time
-            logger.info(f"Database operations took: {processing_time:.4f} seconds")
+            logger.info(
+                f"Database operations took: {processing_time:.4f} seconds")
 
 
 REVIEW_FROM_GPT4 = """

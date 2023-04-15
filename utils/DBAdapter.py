@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from models.model_notes import notes_base
 
 
-import settings
+import utils.settings as settings
 
 engine = create_engine(
     f"{settings.SQLA_CONNECTION_STRING}",

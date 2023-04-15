@@ -11,9 +11,9 @@ import pytest
 from controllers.controller_ehticalai import BuddhistController, RightSpeechEvaluation
 from models.model_ethicalai import RightSpeechModel, Base
 
-from DBAdapter import DBAdapter
+from utils.DBAdapter import DBAdapter
 
-import settings
+import utils.settings as settings
 
 # Set up a test database connection
 #TEST_DATABASE_URL = "sqlite://:memory:"

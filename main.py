@@ -7,7 +7,7 @@ from telethon import events
 from controllers.controller_bot import TelethonWrapper
 from interfaces.bot_telegram import *
 
-import settings
+import utils.settings as settings
 
 app = Quart(__name__)
 
@@ -23,11 +23,13 @@ async def root():
 bot = TelethonWrapper()  # type: ignore
 
 bot.add_event_handler(correct_handler, events.NewMessage(pattern="/correct"))
-bot.add_event_handler(translate_handler, events.NewMessage(pattern="/translate"))
+bot.add_event_handler(
+    translate_handler, events.NewMessage(pattern="/translate"))
 bot.add_event_handler(enrich_handler, events.NewMessage(pattern="/enrich"))
 
 bot.add_event_handler(correct_handler, events.CallbackQuery(data=b"correct"))
-bot.add_event_handler(translate_handler, events.CallbackQuery(data=b"translate"))
+bot.add_event_handler(
+    translate_handler, events.CallbackQuery(data=b"translate"))
 bot.add_event_handler(enrich_handler, events.CallbackQuery(data=b"enrich"))
 bot.add_event_handler(corriger_handler, events.CallbackQuery(data=b"corriger"))
 

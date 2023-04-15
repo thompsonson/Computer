@@ -9,6 +9,7 @@ import pytest
 from controllers.controller_ehticalai import BuddhistController, RightSpeechEvaluation
 from models.model_ethicalai import RightSpeechModel
 
+import utils.settings as settings
 
 @pytest.mark.asyncio
 async def test_process_message():

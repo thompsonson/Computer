@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import Mock, patch
 from controllers.controller_notes import VoiceNoteController
 from controllers.controller_openai import transcribe_speech
-from exceptions import CommandException
+from utils.exceptions import CommandException
 
 
 class TestVoiceNoteController:
