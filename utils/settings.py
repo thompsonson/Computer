@@ -6,7 +6,7 @@ from time import strftime
 logging.basicConfig(
     format="%(asctime)s,%(msecs)03d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s",
     datefmt="%Y-%m-%d:%H:%M:%S",
-    filename='./logs/info_{}.log'.format(strftime('%Y_%m_%d_%T')),
+    filename="./logs/info_{}.log".format(strftime("%Y_%m_%d_%T")),
     encoding="utf-8",
     level=logging.INFO,
 )
@@ -26,7 +26,7 @@ TELEGRAM_SESSION = "telegram.session"
 SQLA_CONNECTION_STRING = "sqlite:///.db/database.db"
 SQLA_ECHO = False
 SQLA_FUTURE = True
-TEST_DATABASE_URL = "sqlite:///.db/test_database.db" #"sqlite:///:memory:"
+TEST_DATABASE_URL = "sqlite:///.db/test_database.db"  # "sqlite:///:memory:"
 
 # TOOLS
 SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")

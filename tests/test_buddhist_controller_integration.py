@@ -16,12 +16,13 @@ from utils.DBAdapter import DBAdapter
 import utils.settings as settings
 
 # Set up a test database connection
-#TEST_DATABASE_URL = "sqlite://:memory:"
+# TEST_DATABASE_URL = "sqlite://:memory:"
 TEST_DATABASE_URL = settings.TEST_DATABASE_URL
+
 
 @pytest.fixture(scope="module")
 def test_database_engine() -> Engine:
-    """ Create a test database engine."""
+    """Create a test database engine."""
     engine = create_engine(TEST_DATABASE_URL)
     # create the tables if they don't exist
     Base.metadata.create_all(engine)
@@ -31,7 +32,7 @@ def test_database_engine() -> Engine:
 
 @pytest.fixture(scope="module")
 def test_database_session(test_database_engine) -> Session:
-    """ Create a test database session."""
+    """Create a test database session."""
     session = DBAdapter().unmanaged_session(local_engine=test_database_engine)
     return session
 

@@ -75,8 +75,7 @@ class RightSpeechEvaluation(BaseModel):
         le=10,
         description="Absence of irrelevant, trivial, or gossip-like content",
     )
-    rationale: str = Field(...,
-                           description="The rationale for the metrics given above")
+    rationale: str = Field(..., description="The rationale for the metrics given above")
 
     def __str__(self):
         metrics = (
@@ -189,7 +188,7 @@ class BuddhistController:
 
         end_time = time.perf_counter()
         processing_time = end_time - start_time
-        logger.info(f"Message processing took {processing_time:.4f} seconds")
+        logger.info("Message processing took %.4f seconds", processing_time)
 
         return response
 
@@ -206,8 +205,7 @@ class BuddhistController:
         finally:
             end_time = time.perf_counter()
             processing_time = end_time - start_time
-            logger.info(
-                f"Database operations took: {processing_time:.4f} seconds")
+            logger.info(f"Database operations took: {processing_time:.4f} seconds")
 
 
 REVIEW_FROM_GPT4 = """

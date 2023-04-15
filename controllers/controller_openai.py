@@ -153,16 +153,14 @@ async def parsable_corriger_message(message: dict) -> FrenchNoteModel:
         str: Text with suggested improvements.
     """
     logger.info("parsable_corriger_text %s", message)
-    llm = OpenAI(model_name="text-davinci-003",
-                 openai_api_key=settings.OPENAI_API_KEY)  # type: ignore
+    llm = OpenAI(
+        model_name="text-davinci-003", openai_api_key=settings.OPENAI_API_KEY
+    )  # type: ignore
     # sets the schema for how the LLM should respond
     response_schemas = [
-        ResponseSchema(name="corriger",
-                       description="La transcription corrige"),
-        ResponseSchema(
-            name="erreurs", description="Les erreurs grammaticales"),
-        ResponseSchema(name="vocabulaire",
-                       description="les vocabulaires alternatifs"),
+        ResponseSchema(name="corriger", description="La transcription corrige"),
+        ResponseSchema(name="erreurs", description="Les erreurs grammaticales"),
+        ResponseSchema(name="vocabulaire", description="les vocabulaires alternatifs"),
         ResponseSchema(
             name="idiomes",
             description="Idiomes et phrases courantes pour améliorer ma façon de parler",
@@ -174,18 +172,15 @@ async def parsable_corriger_message(message: dict) -> FrenchNoteModel:
     ]
 
     response_schemas_short = [
-        ResponseSchema(name="corriger",
-                       description="La transcription corrige"),
-        ResponseSchema(name="vocabulaire",
-                       description="les vocabulaires alternatifs"),
+        ResponseSchema(name="corriger", description="La transcription corrige"),
+        ResponseSchema(name="vocabulaire", description="les vocabulaires alternatifs"),
         ResponseSchema(
             name="conseils",
             description="Conseils pour une structure syntaxique appropriée",
         ),
     ]
 
-    output_parser = StructuredOutputParser.from_response_schemas(
-        response_schemas_short)
+    output_parser = StructuredOutputParser.from_response_schemas(response_schemas_short)
 
     format_instructions = output_parser.get_format_instructions()
     logger.info(format_instructions)

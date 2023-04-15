@@ -32,8 +32,7 @@ class TelethonWrapper:
 
     def add_event_handler(self, event_handler, event):
         "add an event handler"
-        logger.info("adding event handler: %s for event: %s",
-                    event_handler, event)
+        logger.info("adding event handler: %s for event: %s", event_handler, event)
         self._bot.add_event_handler(event_handler, event)
 
 

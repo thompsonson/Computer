@@ -15,6 +15,7 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
+
 @pytest.mark.asyncio
 async def test_process_message():
     # Mock input message

@@ -1,6 +1,7 @@
 """ Test the prompt for the BuddhistController. """
 import os
 import sys
+
 # Add the parent directory of the models package to the Python path
 ROOT_MODULE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, ROOT_MODULE_PATH)
