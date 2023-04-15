@@ -8,7 +8,7 @@ async def test_prompt():
     bad_messages.append("I want to punch my sister.")
     bad_messages.append("I have kicked a cat.")
     bad_messages.append("Shut the f**k up, you are horrible motherf**ker.")
-    
+
     print("\nevaluating the bad messages...\n")
 
     for bad_message in bad_messages:

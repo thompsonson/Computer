@@ -1,9 +1,4 @@
 """ pytest script for the buddhist controller. """
-import os
-import sys
-
-# Add the parent directory of the models package to the Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from langchain.output_parsers import PydanticOutputParser
 from langchain.llms import OpenAI
@@ -29,7 +24,8 @@ async def test_process_message():
   "absence_of_false_speech": 6,
   "absence_of_malicious_speech": 10,
   "absence_of_harsh_speech": 9,
-  "absence_of_idle_chatter": 8
+  "absence_of_idle_chatter": 8,
+  "rationale":"The response is truthful and kind, contributing to a constructive conversation. It is free of false, malicious, harsh and idle chatter."
 }
     """
 
