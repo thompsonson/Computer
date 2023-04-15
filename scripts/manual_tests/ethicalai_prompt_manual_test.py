@@ -22,8 +22,9 @@ async def test_prompt():
         print(f"Message: {bad_message}\n")
         controller = BuddhistController(message=bad_message)
         evaluation = await controller.process_message()
-        print(f"\t{evaluation}")
+        print(f"{evaluation}")
         print("---------------------------------")
+        break
 
     good_messages = []
     good_messages.append(
@@ -40,8 +41,9 @@ async def test_prompt():
         print(f"Message: {good_message}\n")
         controller = BuddhistController(message=good_message)
         evaluation = await controller.process_message()
-        print(f"\t{evaluation}")
+        print(f"{evaluation}")
         print("---------------------------------")
+        break
 
 
 if __name__ == "__main__":

@@ -80,12 +80,12 @@ class RightSpeechEvaluation(BaseModel):
 
     def __str__(self):
         metrics = (
-            f"truthfulness={self.truthfulness} kindness={self.kindness} "
-            f"constructiveness={self.constructiveness} absence_of_false_speech={self.absence_of_false_speech} "
-            f"absence_of_malicious_speech={self.absence_of_malicious_speech} absence_of_harsh_speech={self.absence_of_harsh_speech} "
-            f"absence_of_idle_chatter={self.absence_of_idle_chatter}"
+            f"\ttruthfulness:\t\t\t{self.truthfulness}\n\tkindness:\t\t\t{self.kindness}\n"
+            f"\tconstructiveness:\t\t{self.constructiveness}\n\tabsence_of_false_speech:\t{self.absence_of_false_speech}\n"
+            f"\tabsence_of_malicious_speech:\t{self.absence_of_malicious_speech}\n\tabsence_of_harsh_speech:\t{self.absence_of_harsh_speech}\n"
+            f"\tabsence_of_idle_chatter:\t{self.absence_of_idle_chatter}"
         )
-        return f"{metrics}\n\nrationale={self.rationale}"
+        return f"{metrics}\n\nRationale: {self.rationale}"
 
 
 class BuddhistController:
