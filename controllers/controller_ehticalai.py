@@ -17,6 +17,8 @@ import utils.settings as settings
 from utils.DBAdapter import DBAdapter
 from models.model_ethicalai import RightSpeechModel
 
+from utils.exceptions import LogAndPrintException
+
 logger = logging.getLogger(__name__)
 
 PROMPT_TEMPLATE = """
@@ -36,6 +38,8 @@ YOUR RESPONSE:
 
 
 class RightSpeechEvaluation(BaseModel):
+    """Right Speech Evaluation, stores the message, metrics, and rationale for the metrics."""
+
     truthfulness: int = Field(
         ..., ge=1, le=10, description="Degree of factual accuracy and honesty"
     )
@@ -98,22 +102,16 @@ class BuddhistController:
         llm: Optional[OpenAI] = None,
         output_parser: Optional[PydanticOutputParser] = None,
     ):
-        """
-        sets the model for the controller
-
-        I am consdiering going full on with dependency injection,
-            however I like having the fall back as, presently, the
-            only value I see in dependancy injection is for testing.
-            (hopefully more GPTs come available though!!)
-
-        """
+        # set the model (done like this to support more varied testing)
+        self._model = model or RightSpeechModel
+        if hasattr(self, "_for_model_info") and self._for_model_info:  # type: ignore
+            return
+        self._for_model_info = False
         # handler the inputted message
         self._message = message
         logger.info("message: %s", self._message)
         # set up the DB session
         self._session = session or DBAdapter().unmanaged_session()
-        # set the model (done like this to support more varied testing)
-        self._model = model or RightSpeechModel
 
         # set up the LLM to use (done like this to support more varied testing)
         # type: ignore
@@ -127,6 +125,14 @@ class BuddhistController:
             pydantic_object=RightSpeechEvaluation
         )
 
+    @classmethod
+    def for_model_info(cls):
+        """Create an instance of the controller that is used to get information about the model **only**."""
+        instance = cls.__new__(cls)
+        instance._for_model_info = True  # type: ignore
+        instance.__init__("", None, RightSpeechModel, None, None)
+        return instance
+
     def _prepare_prompt(self) -> str:
         """
         Prepare the input prompt for the API request to review the message for alignment to Buddhist principles of Right Speech.
@@ -137,6 +143,11 @@ class BuddhistController:
         Returns:
             str: The prepared input prompt for the API request.
         """
+
+        if self._for_model_info:
+            raise RuntimeError(
+                "process_message cannot be called on an instance created with for_model_info"
+            )
 
         format_instructions = self._output_parser.get_format_instructions()
         logger.info(format_instructions)
@@ -164,6 +175,12 @@ class BuddhistController:
             dict:   scoring, on a scale of 1 to 10,
                     where 1 indicates poor alignment with the principle and 10 indicates excellent alignment to the principle.
         """
+
+        if self._for_model_info:
+            raise RuntimeError(
+                "process_message cannot be called on an instance created with for_model_info"
+            )
+
         start_time = time.perf_counter()
         logger.info("process_message %s", self._message)
 
@@ -180,9 +197,7 @@ class BuddhistController:
 
             self._model = self._model(**response.dict())
         except Exception as err:
-            logger.error(err)
-            print(f"Error: {err=}, {type(err)=}")
-            return None
+            raise LogAndPrintException(err) from err
 
         self.save()
 
@@ -199,19 +214,20 @@ class BuddhistController:
             self._session.add(self._model)
             self._session.commit()
             logger.info("Successfully saved RightSpeechModel to the database")
-        except Exception as e:
-            logger.error(f"Error during database operation: {e}")
+        except Exception as err:
+            logger.error("Error during database operation: %s", err)
             self._session.rollback()
         finally:
             end_time = time.perf_counter()
             processing_time = end_time - start_time
             logger.info(f"Database operations took: {processing_time:.4f} seconds")
 
-
-REVIEW_FROM_GPT4 = """
-Here are a few suggestions to improve the current implementation of the BuddhistController:
-
-Test coverage: Ensure that you have comprehensive test coverage for the different components of the controller, including unit tests, integration tests, and end-to-end tests. This will help you catch potential issues early and ensure that your implementation is robust.
-
-With these improvements, your implementation will be more robust, maintainable, and easier to debug.
-"""
+    def get_model_info(self):
+        """returns the model info as a list of tuples
+        (which change be used by Gradio, hopefully other interfraces as well)"""
+        model_info = []
+        for column in self._model.__table__.columns:
+            if column.name == "id":  # Skip primary key
+                continue
+            model_info.append((column.name, type(column.type)))
+        return model_info

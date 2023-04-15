@@ -5,6 +5,9 @@ telegram_response.txt
 *.session
 *.db
 
+#ignore the gradio flagged folder
+flagged/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
