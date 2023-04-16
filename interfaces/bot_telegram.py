@@ -3,7 +3,7 @@
 import logging
 import re
 from telethon import TelegramClient, events, functions, types, Button
-import settings
+import utils.settings as settings
 
 from models.model_notes import VoiceNoteModel, notes_base
 from controllers.controller_notes import (
@@ -25,7 +25,8 @@ async def corriger_handler(event):
     """Use OpenAI Da Vinci to correct the previous message"""
     french_note_controller = FrenchNoteController(message_store.get_last())
     response = await french_note_controller.corriger_message()
-    await message_store.send(event, response.corriger, note_id=response.note_id)  # type: ignore
+    # type: ignore
+    await message_store.send(event, response.corriger, note_id=response.note_id)
     raise events.StopPropagation
 
 

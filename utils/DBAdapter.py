@@ -7,9 +7,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
 from models.model_notes import notes_base
+from models.model_ethicalai import Base as ethicalai_base
 
-
-import settings
+import utils.settings as settings
 
 engine = create_engine(
     f"{settings.SQLA_CONNECTION_STRING}",
@@ -18,6 +18,7 @@ engine = create_engine(
 )
 # create the tables if they don't exist
 notes_base.metadata.create_all(engine)
+ethicalai_base.metadata.create_all(engine)
 
 
 class DBAdapter:

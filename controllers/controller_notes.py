@@ -9,13 +9,13 @@ from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 
-import settings
+import utils.settings as settings
 
 from models.model_notes import NoteModel, VoiceNoteModel, FrenchNoteModel
 import controllers.controller_openai as controller_openai
-from exceptions import CommandException
+from utils.exceptions import CommandException
 
-from DBAdapter import DBAdapter
+from utils.DBAdapter import DBAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,9 @@ class NoteController:
     async def generate_additonal_info(self, note_id: int):
         "Calls GPT to generate topics, summary and sentiment"
         with DBAdapter().managed_session() as session:  # type: ignore
-            self._model = session.query(NoteModel).filter_by(id=note_id).first()  # type: ignore
+            self._model = (
+                session.query(NoteModel).filter_by(id=note_id).first()
+            )  # type: ignore
             if not self._model:
                 raise ValueError("No note with that id")
         await controller_openai.generate_additonal_info(self._model)
@@ -141,7 +143,9 @@ class VoiceNoteController:
         if force or not self._voice_note_model.transcribed:
             # transcibe
             if self._voice_note_model.file_encoding == "ogg":
-                voice_file = self._ogg2mp3(self._voice_note_model.file_location)  # type: ignore
+                voice_file = self._ogg2mp3(
+                    self._voice_note_model.file_location
+                )  # type: ignore
             else:
                 voice_file = self._voice_note_model.file_location
             # call openai to transcibe the file
@@ -197,13 +201,17 @@ class FrenchNoteController:
             self._session.query(NoteModel).filter_by(id=self._note_id).first()
         )
         self._voice_note_model = (
-            self._session.query(VoiceNoteModel).filter_by(id=self._voice_note_id).first()
+            self._session.query(VoiceNoteModel)
+            .filter_by(id=self._voice_note_id)
+            .first()
         )
         self._french_note_model = FrenchNoteModel(id=self._note_id)
         self._french_note_model.note = self._voice_note_model.note
 
         # set up the LLM to use
-        self._llm = OpenAI(model_name=settings.GPT_MODEL, openai_api_key=settings.OPENAI_API_KEY)  # type: ignore
+        self._llm = OpenAI(
+            model_name=settings.GPT_MODEL, openai_api_key=settings.OPENAI_API_KEY
+        )  # type: ignore
 
         # set up the schema and outputparser for the LLM interaction (note some are commented out due to using too many tokens)
         self._response_schemas = [
@@ -298,5 +306,7 @@ YOUR RESPONSE:
 
     def save(self):
         """Saves the note to the database"""
-        self._session.add_all([self._french_note_model, self._note_model, self._voice_note_model])
+        self._session.add_all(
+            [self._french_note_model, self._note_model, self._voice_note_model]
+        )
         self._session.commit()

@@ -2,7 +2,7 @@
 import logging
 from telethon import TelegramClient
 
-import settings
+import utils.settings as settings
 
 
 logger = logging.getLogger(__name__)

@@ -4,12 +4,15 @@ from quart import Quart
 
 from telethon import events
 
+from interfaces.api_ethicalai import api_blueprint
+
 from controllers.controller_bot import TelethonWrapper
 from interfaces.bot_telegram import *
 
-import settings
+import utils.settings as settings
 
 app = Quart(__name__)
+app.register_blueprint(api_blueprint)
 
 
 # Quart handlers
@@ -33,8 +36,10 @@ bot.add_event_handler(corriger_handler, events.CallbackQuery(data=b"corriger"))
 
 bot.add_event_handler(new_message_handler, events.NewMessage(outgoing=False))
 
-bot.start_bot()  # type: ignore
+if __name__ == "__main__":
+    bot.start_bot()  # type: ignore
 
 app.run(
     loop=bot.get_loop(), host="0.0.0.0", port=8080
 )  # <- same event loop as telethon
+#    app.run(host="0.0.0.0", port=8080)

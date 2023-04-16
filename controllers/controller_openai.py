@@ -11,7 +11,7 @@ from langchain.llms import OpenAI
 
 from models.model_notes import NoteModel, FrenchNoteModel
 
-import settings
+import utils.settings as settings
 
 logger = logging.getLogger(__name__)
 
@@ -153,7 +153,9 @@ async def parsable_corriger_message(message: dict) -> FrenchNoteModel:
         str: Text with suggested improvements.
     """
     logger.info("parsable_corriger_text %s", message)
-    llm = OpenAI(model_name="text-davinci-003", openai_api_key=settings.OPENAI_API_KEY)  # type: ignore
+    llm = OpenAI(
+        model_name="text-davinci-003", openai_api_key=settings.OPENAI_API_KEY
+    )  # type: ignore
     # sets the schema for how the LLM should respond
     response_schemas = [
         ResponseSchema(name="corriger", description="La transcription corrige"),
