@@ -4,7 +4,7 @@ import logging
 import time
 from typing import Type
 from sqlalchemy.orm import Session
-from sqlalchemy.orm import DeclarativeBase  
+from sqlalchemy.orm import DeclarativeBase
 
 from langchain.schema import BaseOutputParser
 from langchain.prompts import PromptTemplate
