@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from controllers.controller_notes import FrenchNoteController
-from models.model_notes import FrenchNoteModel, NoteModel, notes_base as Base
+from models.sql.notes import FrenchNoteModel, NoteModel, notes_base as Base
 
 
 # Define some test fixtures

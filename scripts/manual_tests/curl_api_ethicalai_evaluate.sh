@@ -1,4 +1,4 @@
-curl -X POST \                                                              ✔ │ took 4s   │ ▼ │ at 19:13:55   │ toundra 🛠 │ active  
+curl -X POST \     
      -H "Content-Type: application/json" \
      -H "Authorization: Bearer token1" \
      -d '{"message": "Sample message for evaluation."}' \

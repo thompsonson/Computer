@@ -11,7 +11,7 @@ from langchain.llms import OpenAI
 
 import utils.settings as settings
 
-from models.model_notes import NoteModel, VoiceNoteModel, FrenchNoteModel
+from models.sql.notes import NoteModel, VoiceNoteModel, FrenchNoteModel
 import controllers.controller_openai as controller_openai
 from utils.exceptions import CommandException
 

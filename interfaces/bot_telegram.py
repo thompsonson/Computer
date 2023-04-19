@@ -5,20 +5,29 @@ import re
 from telethon import TelegramClient, events, functions, types, Button
 import utils.settings as settings
 
-from models.model_notes import VoiceNoteModel, notes_base
 from controllers.controller_notes import (
     VoiceNoteController,
     NoteController,
     FrenchNoteController,
 )
 from controllers.controller_bot import MessageSend
-from controllers.controller_openai import correct_text, translate_text, corriger_text
+from controllers.controller_openai import correct_text, translate_text
+from controllers.prompts.html import HtmlController
 
 
 logger = logging.getLogger(__name__)
 message_store = MessageSend()
 
 logger.info("Hello World")
+
+
+async def generate_html_handler(event):
+    """Use OpenAI Da Vinci to create a website from the previous message"""
+    html_controller = HtmlController(message_store.get_last())
+    response = await html_controller.process_message()
+    # type: ignore
+    await message_store.send(event, f"Created html file: {response.filename}")
+    raise events.StopPropagation
 
 
 async def corriger_handler(event):
@@ -95,4 +104,5 @@ def _options():
         Button.inline("Correct", data=b"correct"),
         Button.inline("Translate", data=b"translate"),
         Button.inline("Corriger", data=b"corriger"),
+        Button.inline("Generate HTML", data=b"gen_html"),
     ]

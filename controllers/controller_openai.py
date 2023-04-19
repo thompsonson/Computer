@@ -9,7 +9,7 @@ from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 
-from models.model_notes import NoteModel, FrenchNoteModel
+from models.sql.notes import NoteModel, FrenchNoteModel
 
 import utils.settings as settings
 

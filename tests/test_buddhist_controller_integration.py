@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, AsyncMock
 import pytest
 
 from controllers.controller_ehticalai import BuddhistController, RightSpeechEvaluation
-from models.model_ethicalai import RightSpeechModel, Base
+from models.sql.ethicalai import RightSpeechModel, Base
 
 from utils.DBAdapter import DBAdapter
 

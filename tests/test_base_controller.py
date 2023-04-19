@@ -3,7 +3,6 @@
 import pytest
 from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import Session
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import DeclarativeBase
 from pydantic import BaseModel
 
@@ -11,7 +10,7 @@ from typing import Optional, Type
 from langchain.schema import BaseOutputParser
 from langchain.output_parsers import ResponseSchema
 from langchain.llms import OpenAI
-from controllers.BaseController import BaseController
+from controllers.prompts.base import BaseController
 
 
 class Base(DeclarativeBase):
@@ -72,6 +71,7 @@ class MockLLM:
 
     def __call__(self, prompt: str) -> str:
         """Return a sample LLM output."""
+        print(prompt)
         return "Sample LLM Output"
 
 
@@ -82,8 +82,8 @@ def base_controller():
         message="Test message",
         model=MockModel,
         session=Session(),
-        llm=MockLLM(),
-        output_parser=MockOutputParser,
+        llm=MockLLM(),  # type: ignore
+        output_parser=MockOutputParser(),  # type: ignore
     )
 
 
@@ -118,7 +118,7 @@ def base_controller_for_testing():
         model=MockModel,
         session=Session(),
         llm=MockLLM(),
-        output_parser=MockOutputParser,
+        output_parser=MockOutputParser(),
     )
 
 
