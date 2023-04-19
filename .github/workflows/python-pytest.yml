@@ -24,6 +24,6 @@ jobs:
         poetry install
     - name: Run specific pytests
       run: |
-        poetry run pytest tests/test_base_controller.py
-        poetry run pytest tests/test_html_controller.py
-        poetry run pytest tests/test_buddhist_controller_unit.py
+        pytest tests/test_base_controller.py
+        pytest tests/test_html_controller.py
+        pytest tests/test_buddhist_controller_unit.py
