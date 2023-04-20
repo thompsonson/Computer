@@ -7,5 +7,5 @@ http://localhost:8080/api/html/generate | jq
 
 curl -X POST \
      -H "Content-Type: application/json" \
-     -d '{"message": "Generate a website that acts as an index page for information on AI capability and AI alignment."}' \
+     -d '{"message": "Generate HTML, with images, that acts as an index page for information on AI capability and AI alignment. It should give a short description of each area."}' \
 http://localhost:8080/api/html/generate 
