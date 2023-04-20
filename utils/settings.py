@@ -26,7 +26,7 @@ TELEGRAM_SESSION = ".db/telegram.session"
 SQLA_CONNECTION_STRING = "sqlite:///.db/database.db"
 SQLA_ECHO = False
 SQLA_FUTURE = True
-TEST_DATABASE_URL = "sqlite:///.db/test_database.db"  # "sqlite:///:memory:"
+TEST_DATABASE_URL = "sqlite:///:memory:" #"sqlite:///.db/test_database.db"  # 
 
 # TOOLS
 SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")
