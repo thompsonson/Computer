@@ -1,5 +1,5 @@
 from quart import Blueprint, request, jsonify, abort
-from controllers.prompts.html import HtmlController
+from controllers.prompts.generate_html import HtmlController
 
 html_api = Blueprint("html_api", __name__)
 

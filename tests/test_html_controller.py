@@ -8,12 +8,13 @@ from sqlalchemy.orm import sessionmaker
 from models.pydantic.html import HtmlModel as pydantic_html
 from models.sql.html import HtmlFile as sql_html, Image as sql_image, Base
 
-from controllers.prompts.html import HtmlController
+from controllers.prompts.generate_html import HtmlController
 
 import utils.settings as settings
 
 
 # Pydantic models
+
 
 def test_html_model():
     """Test the creation of an HtmlModel instance."""

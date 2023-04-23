@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from models.sql.notes import notes_base
 from models.sql.ethicalai import Base as ethicalai_base
 from models.sql.html import Base as html_base
+from models.sql.code_documentation import Base as code_doc_base
 
 import utils.settings as settings
 
@@ -21,6 +22,7 @@ engine = create_engine(
 notes_base.metadata.create_all(engine)
 ethicalai_base.metadata.create_all(engine)
 html_base.metadata.create_all(engine)
+code_doc_base.metadata.create_all(engine)
 
 
 class DBAdapter:
