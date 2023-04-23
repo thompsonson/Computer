@@ -12,7 +12,7 @@ from controllers.controller_notes import (
 )
 from controllers.controller_bot import MessageSend
 from controllers.controller_openai import correct_text, translate_text
-from controllers.prompts.html import HtmlController
+from controllers.prompts.generate_html import HtmlController
 
 
 logger = logging.getLogger(__name__)
