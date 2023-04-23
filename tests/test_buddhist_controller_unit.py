@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, AsyncMock
 import pytest
 
 from controllers.controller_ehticalai import BuddhistController, RightSpeechEvaluation
-from models.model_ethicalai import RightSpeechModel
+from models.sql.ethicalai import RightSpeechModel
 
 import utils.settings as settings
 

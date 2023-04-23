@@ -13,6 +13,7 @@ from langchain.llms import OpenAI
 from utils.exceptions import LogAndPrintException
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class BaseController:
@@ -45,7 +46,8 @@ YOUR RESPONSE:
 
         self._llm = llm
 
-        self._output_parser = output_parser()
+        self._output_parser = output_parser
+        logger.debug("_output_parser: %s", self._output_parser)
 
     def _prepare_prompt(self) -> str:
         """Prepare the input prompt for the API request"""
@@ -65,6 +67,10 @@ YOUR RESPONSE:
 
         return str(prompt_value)
 
+    def response_to_model(self, response):
+        """standard method to convert response to sqlalchemy model"""
+        self._model = self._model(**response.dict())
+
     async def process_message(self) -> Type[DeclarativeBase]:
         """Process the prompt and return the model"""
         start_time = time.perf_counter()
@@ -80,8 +86,11 @@ YOUR RESPONSE:
             response = self._output_parser.parse(llm_output)  # type: ignore
 
             logger.info("Parsed response: %s", response)
+            logger.info("type of parsed response: %s", type(response))
+            logger.info("dict from parsed response: %s", response.dict())
 
-            self._model = self._model(**response.dict())
+            self.response_to_model(response)
+
         except Exception as err:
             raise LogAndPrintException(err) from err
 
@@ -106,4 +115,4 @@ YOUR RESPONSE:
         finally:
             end_time = time.perf_counter()
             processing_time = end_time - start_time
-            logger.info(f"Database operations took: {processing_time:.4f} seconds")
+            logger.info("Message processing took %.4f seconds", processing_time)

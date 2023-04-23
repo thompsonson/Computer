@@ -11,7 +11,7 @@ from langchain.llms import OpenAI
 
 import utils.settings as settings
 
-from models.model_notes import NoteModel, VoiceNoteModel, FrenchNoteModel
+from models.sql.notes import NoteModel, VoiceNoteModel, FrenchNoteModel
 import controllers.controller_openai as controller_openai
 from utils.exceptions import CommandException
 
@@ -210,24 +210,26 @@ class FrenchNoteController:
 
         # set up the LLM to use
         self._llm = OpenAI(
-            model_name=settings.GPT_MODEL, openai_api_key=settings.OPENAI_API_KEY
+            model_name=settings.GPT_MODEL,
+            openai_api_key=settings.OPENAI_API_KEY,
+            max_tokens=-1,
         )  # type: ignore
 
-        # set up the schema and outputparser for the LLM interaction (note some are commented out due to using too many tokens)
+        # set up the schema and outputparser for the LLM interaction
         self._response_schemas = [
             ResponseSchema(name="corriger", description="La transcription corrige"),
             # ResponseSchema(name="erreurs", description="Les erreurs grammaticales"),
             ResponseSchema(
                 name="vocabulaire", description="les vocabulaires alternatifs"
             ),
-            # ResponseSchema(
-            #    name="idiomes",
-            #    description="Idiomes et phrases courantes pour améliorer ma façon de parler",
-            # ),
-            # ResponseSchema(
-            #    name="conseils",
-            #    description="Conseils pour une structure syntaxique appropriée",
-            # ),
+            ResponseSchema(
+                name="idiomes",
+                description="Idiomes et phrases courantes pour améliorer ma façon de parler",
+            ),
+            ResponseSchema(
+                name="conseils",
+                description="Conseils pour une structure syntaxique appropriée",
+            ),
         ]
 
         self._output_parser = StructuredOutputParser.from_response_schemas(

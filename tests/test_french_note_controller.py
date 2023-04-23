@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 
-from models.model_notes import NoteModel, FrenchNoteModel
+from models.sql.notes import NoteModel, FrenchNoteModel
 from controllers.controller_notes import FrenchNoteController
 
 

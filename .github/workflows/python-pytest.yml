@@ -1,0 +1,30 @@
+name: Python Pytest
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade langchain llama_index
+        curl -sSL https://install.python-poetry.org | python -
+        poetry config virtualenvs.create false
+        poetry install
+    - name: Run specific pytests
+      run: |
+        pytest tests/test_base_controller.py
+        pytest tests/test_html_controller.py
+        pytest tests/test_buddhist_controller_unit.py

@@ -4,6 +4,8 @@ telegram_response.txt
 *.ogg
 *.session
 *.db
+.envrc_local
+.indexes*
 
 #ignore the gradio flagged folder
 flagged/

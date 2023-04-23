@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field, validator
 import utils.settings as settings
 
 from utils.DBAdapter import DBAdapter
-from models.model_ethicalai import RightSpeechModel
+from models.sql.ethicalai import RightSpeechModel
 
 from utils.exceptions import LogAndPrintException
 
