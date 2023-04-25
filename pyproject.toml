@@ -18,6 +18,7 @@ unstructured = "^0.5.12"
 beautifulsoup4 = "^4.12.2"
 tiktoken = "^0.3.3"
 astunparse = "^1.6.3"
+typer = "^0.7.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

@@ -70,7 +70,7 @@ class CodeDocumentationVisitor(ast.NodeVisitor):
         if parent_class is None and not is_top_level:
             return
         logger.debug(
-            f"Processing function '{node.name}' as a method of class '{parent_class}'"
+            "Processing function '%s' as a method of class '%s'", node.name, parent_class
         )
         # Determine if the function is a method of a class
         code_class = None
@@ -82,9 +82,8 @@ class CodeDocumentationVisitor(ast.NodeVisitor):
         # Create a CodeFunction entry for the function definition
         function = CodeFunction(
             name=node.name,
-            return_type=astunparse.unparse(node.returns).strip()
-            if node.returns
-            else None,
+            return_type=astunparse.unparse(node.returns).strip() if node.returns else None,
+            docstring=ast.get_docstring(node), 
             source_file=self.source_file,
             code_class=code_class,
         )
@@ -106,9 +105,7 @@ class CodeDocumentationVisitor(ast.NodeVisitor):
 
             argument = Argument(
                 name=arg.arg,
-                arg_type=astunparse.unparse(arg.annotation).strip()
-                if arg.annotation
-                else None,
+                arg_type=astunparse.unparse(arg.annotation).strip() if arg.annotation else None, # type: ignore
                 optional=has_default,
                 function=function,
             )
@@ -116,7 +113,7 @@ class CodeDocumentationVisitor(ast.NodeVisitor):
 
     # Add a new method to handle top-level functions
     def visit_TopLevelFunctionDef(self, node: ast.FunctionDef):
-        logger.debug(f"Processing function '{node.name}' as a top-level function")
+        logger.debug("Processing function '%s' as a top-level function", node.name)
         self.visit_FunctionDef(node, is_top_level=True)
 
 
@@ -140,7 +137,6 @@ class CodeDocumentation:
         """
         self._folder_path = folder_path
         self._session = session or DBAdapter().unmanaged_session()
-        self._module_name = module_name
 
         # Retrieve the Git origin URL from the folder
         try:
