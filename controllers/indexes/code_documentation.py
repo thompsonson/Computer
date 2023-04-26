@@ -3,6 +3,7 @@ import ast
 import astunparse
 import os
 import subprocess
+import pydocstyle
 from typing import Optional
 
 from sqlalchemy.orm import Session
@@ -70,7 +71,9 @@ class CodeDocumentationVisitor(ast.NodeVisitor):
         if parent_class is None and not is_top_level:
             return
         logger.debug(
-            "Processing function '%s' as a method of class '%s'", node.name, parent_class
+            "Processing function '%s' as a method of class '%s'",
+            node.name,
+            parent_class,
         )
         # Determine if the function is a method of a class
         code_class = None
@@ -79,13 +82,23 @@ class CodeDocumentationVisitor(ast.NodeVisitor):
                 self.session.query(CodeClass).filter_by(name=parent_class).first()
             )
 
+        # check if the docstring violates the Google style guide
+        docstring = ast.get_docstring(node)
+        valid_docstring = True
+        violations = pydocstyle.checker.Checker.check_source(docstring)
+        logger.debug("Violations: %s", violations)
+        if violations:
+            valid_docstring = False
         # Create a CodeFunction entry for the function definition
         function = CodeFunction(
             name=node.name,
-            return_type=astunparse.unparse(node.returns).strip() if node.returns else None,
-            docstring=ast.get_docstring(node), 
+            return_type=astunparse.unparse(node.returns).strip()
+            if node.returns
+            else None, # type: ignore
+            docstring=docstring, # type: ignore
+            valid_docstring=valid_docstring,
             source_file=self.source_file,
-            code_class=code_class,
+            code_class=code_class, # type: ignore
         )
         self.session.add(function)
 
@@ -105,7 +118,7 @@ class CodeDocumentationVisitor(ast.NodeVisitor):
 
             argument = Argument(
                 name=arg.arg,
-                arg_type=astunparse.unparse(arg.annotation).strip() if arg.annotation else None, # type: ignore
+                arg_type=astunparse.unparse(arg.annotation).strip() if arg.annotation else None,  # type: ignore
                 optional=has_default,
                 function=function,
             )
@@ -245,3 +258,20 @@ class CodeDocumentation:
                 if file_name.endswith(".py"):
                     file_path = os.path.join(root, file_name)
                     self._analyze_module(file_path)
+
+    def update_docstrings(self) -> None:
+        # Walk through the files in the directory
+        for root, _, files in os.walk(folder_path):
+            for file_name in files:
+                if file_name.endswith(".py"):
+                    file_path = os.path.join(root, file_name)
+                    # Read the source code from the file
+                    with open(file_path, "r") as file:
+                        source_code = file.read()
+                    # Update docstrings in the source code
+                    updated_code = update_docstrings_in_code(source_code)
+                    # Save the updated source code to the same file
+                    with open(file_path, "w") as file:
+                        file.write(updated_code)
+                    # Print the updated source code (optional)
+                    print(updated_code)

@@ -139,7 +139,8 @@ class CodeFunction(Base):
     source_file = relationship("SourceFile", back_populates="functions")
     code_class_id = Column(Integer, ForeignKey("code_classes.id"), nullable=True)
     code_class = relationship("CodeClass", back_populates="methods")
-    docstring = Column(String, nullable=True) 
+    docstring = Column(String, nullable=True)
+    valid_docstring = Column(Boolean, nullable=True)
     arguments = relationship("Argument", back_populates="function")
 
     def __repr__(self):
@@ -150,6 +151,7 @@ class CodeFunction(Base):
         name: str,
         return_type: str,
         docstring: str,
+        valid_docstring: bool,
         source_file: SourceFile,
         code_class: CodeClass = None,
     ):
@@ -168,6 +170,7 @@ class CodeFunction(Base):
         self.source_file = source_file
         self.code_class = code_class
         self.docstring = docstring
+        self.valid_docstring = valid_docstring
 
 
 class Argument(Base):

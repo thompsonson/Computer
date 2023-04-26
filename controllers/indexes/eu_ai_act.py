@@ -60,7 +60,7 @@ for doc in docs:
     print("______________________________________________________")
 
 
-from llama_index import Document
+#from llama_index import Document
 
-text_list = [text1, text2, ...]
-documents = [Document(t) for t in text_list]
+#text_list = [text1, text2, ...]
+#documents = [Document(t) for t in text_list]
