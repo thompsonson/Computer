@@ -6,6 +6,8 @@ telegram_response.txt
 *.db
 .envrc_local
 .indexes*
+*.whl
+*.code-workspace
 
 #ignore the gradio flagged folder
 flagged/

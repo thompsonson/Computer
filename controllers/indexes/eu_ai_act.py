@@ -33,8 +33,19 @@ url = "https://www.europarl.europa.eu/meps/en/search/advanced?name=&countryCode=
 member_urls = extract_member_urls(url)
 
 loader = UnstructuredURLLoader(urls=member_urls)
-
 data = loader.load()
+
+social_media = [
+    "Facebook",
+    "Twitter",
+    "Flickr",
+    "LinkedIn",
+    "YouTube",
+    "Instagram",
+    "Pinterest",
+    "Snapchat",
+    "Reddit",
+]
 
 for entry in data:
     entry.page_content = entry.page_content.replace("\t", ".")
@@ -45,6 +56,12 @@ for entry in data:
         entry.page_content = entry.page_content.replace(".\n", ".")
         entry.page_content = entry.page_content.replace("  ", " ")
         entry.page_content = entry.page_content.replace("..", ".")
+    for social in social_media:
+        entry.page_content = entry.page_content.replace(
+            f"Check out Parliament on {social}.", ""
+        )
+
+print(data)
 
 
 embeddings = OpenAIEmbeddings()  # type: ignore
