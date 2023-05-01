@@ -84,21 +84,21 @@ class CodeDocumentationVisitor(ast.NodeVisitor):
 
         # check if the docstring violates the Google style guide
         docstring = ast.get_docstring(node)
-        valid_docstring = True
-        violations = pydocstyle.checker.Checker.check_source(docstring)
-        logger.debug("Violations: %s", violations)
-        if violations:
-            valid_docstring = False
+        valid_docstring = False
+        # violations = pydocstyle.checker.Checker.check_source(docstring)
+        # logger.debug("Violations: %s", violations)
+        # if violations:
+        #    valid_docstring = False
         # Create a CodeFunction entry for the function definition
         function = CodeFunction(
             name=node.name,
             return_type=astunparse.unparse(node.returns).strip()
             if node.returns
-            else None, # type: ignore
-            docstring=docstring, # type: ignore
+            else None,  # type: ignore
+            docstring=docstring,  # type: ignore
             valid_docstring=valid_docstring,
             source_file=self.source_file,
-            code_class=code_class, # type: ignore
+            code_class=code_class,  # type: ignore
         )
         self.session.add(function)
 

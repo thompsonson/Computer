@@ -10,6 +10,7 @@ from models.sql.notes import notes_base
 from models.sql.ethicalai import Base as ethicalai_base
 from models.sql.html import Base as html_base
 from models.sql.code_documentation import Base as code_doc_base
+from models.sql.mep import Base as mep_base
 
 import utils.settings as settings
 
@@ -23,6 +24,7 @@ notes_base.metadata.create_all(engine)
 ethicalai_base.metadata.create_all(engine)
 html_base.metadata.create_all(engine)
 code_doc_base.metadata.create_all(engine)
+mep_base.metadata.create_all(engine)
 
 
 class DBAdapter:
